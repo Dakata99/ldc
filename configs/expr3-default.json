@@ -1,0 +1,58 @@
+{
+    "logistic-regression": {
+        "class_weight": [
+            "balanced"
+        ],
+        "max_iter": [
+            10000
+        ],
+        "random_state": [
+            0
+        ]
+    },
+    "random-forest": {
+        "random_state": [
+            0
+        ],
+        "class_weight": [
+            "balanced"
+        ],
+        "min_samples_split": [
+            5
+        ]
+    },
+    "tree": {
+        "binarize": [
+            true
+        ],
+        "min_samples_leaf": [
+            2
+        ],
+        "min_samples_split": [
+            5
+        ],
+        "max_depth": [
+            100
+        ]
+    },
+    "gradient-boosting": {
+        "random_state": [
+            0
+        ]
+    },
+    "neural-network": {
+        "random_state": [
+            1
+        ]
+    },
+    "svm": [
+        {
+            "coef0": [
+                1.0
+            ],
+            "probability": [
+                true
+            ]
+        }
+    ]
+}

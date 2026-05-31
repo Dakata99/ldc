@@ -1,0 +1,1064 @@
+<!DOCTYPE html><html><head>
+    <meta charset="utf-8">
+    <title>Orange Report</title>
+
+    <style>
+    html, body, table {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 13px;
+        margin:0px;
+        padding:0;
+        border:0 none;
+    }
+
+    h1, h2 , h3, h4, h5 {
+       padding: 1px;
+       font-size:100%;
+    }
+
+    h1 {
+        color: white;
+        background-color: black;
+        padding: 4px;
+        margin-top: 12px;
+        margin-bottom: 6px;
+    }
+
+    h2 {
+        border-bottom: 1px solid black;
+        padding-left: 2px;
+    }
+
+    ul, table, p {
+        padding: 10px;
+    }
+
+    table {
+        margin-left: -6px;
+    }
+
+    span.timestamp {
+        position: absolute;
+        right: 40px;
+        color:#ddd;
+    }
+
+    div.selected, div.normal {
+        margin: 5px;
+    }
+
+    div.selected {
+        background: #ddd;
+    }
+    @media print{
+        div.selected {
+            background: inherit;
+        }
+        ::-webkit-input-placeholder {
+            color: transparent;
+        }
+    }
+
+    div.content {
+        margin-left: 15px;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 2px 6px 2px 6px;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+    @media screen {
+        td, th {
+            white-space: nowrap;
+        }
+    }
+
+    .caption {
+        text-align: center;
+        font-size: 90%;
+    }
+
+    img {
+        display: block;
+        margin: auto;
+        max-height: 20cm;
+    }
+
+    span.legend-square {
+        width: 1em;
+        height: 1em;
+        margin-right: 6px;
+        display: inline-block;
+    }
+
+    span.legend-item {
+        margin-right: 24px;
+    }
+
+    textarea {
+        border: 1px solid silver;
+        font-style: italic;
+        width: 100%;
+        height: 4em;
+    }
+
+    .textwrapper {
+        padding: 15px;
+    }
+
+    div.normal textarea:invalid {
+        display: none;
+    }
+
+    div.selected textarea {
+        display: block;
+    }
+
+    @media print{
+        section.section, img {
+            page-break-inside: avoid;
+        }
+    }
+    </style>
+    <script>
+    function scrollToId(id) {
+        var sel_el = document.getElementById(id);
+        if (sel_el != undefined) {
+            sel_el.scrollIntoView();
+            return true;
+        }
+        return false;
+    };
+
+    function setSelectedId(id) {
+        var sel_el = document.getElementsByClassName('selected')[0];
+        if (sel_el != undefined && sel_el.id != id) {
+           sel_el.className = 'normal';
+        }
+        sel_el = document.getElementById(id);
+        if (sel_el != undefined) {
+            sel_el.className = 'selected';
+            return true;
+        }
+        return false;
+    };
+    </script>
+
+</head><body onload="(function (id) {     setSelectedId(id); scrollToId(id); }(&quot;1345254890176&quot;));">
+
+ 
+
+<div id="1345254890608" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Test and Score <span class="timestamp">Sat May 30 26, 13:45:44</span></h1><div class="content">
+<h2>Settings</h2><ul><b>Sampling type:</b> No sampling, test on testing data<br><b>Target class:</b> None, show average over classes<br></ul><h2>Scores</h2><table>
+<tbody><tr><th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Model</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">AUC</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">CA</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">F1</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Prec</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Recall</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">MCC</th>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Gradient Boosting</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.960</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.893</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.893</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.893</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.893</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.734</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Logistic Regression</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.896</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.809</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.818</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.856</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.809</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.614</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Neural Network</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.934</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.862</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.864</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.867</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.862</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.668</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Random Forest</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.971</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.912</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.913</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.915</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.912</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.786</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">SVM</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.919</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.843</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.844</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.846</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.843</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.615</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Tree</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.820</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.891</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.890</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.889</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.891</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.724</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254892192" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Test and Score <span class="timestamp">Sat May 30 26, 13:45:50</span></h1><div class="content">
+<h2>Settings</h2><ul><b>Sampling type:</b> No sampling, test on testing data<br><b>Target class:</b> Sick<br></ul><h2>Scores</h2><table>
+<tbody><tr><th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Model</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">AUC</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">CA</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">F1</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Prec</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Recall</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">MCC</th>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Gradient Boosting</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.960</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.893</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.926</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.926</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.927</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.734</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Logistic Regression</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.896</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.809</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.854</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.953</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.774</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.614</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Neural Network</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.934</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.862</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.903</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.920</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.886</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.668</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Random Forest</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.971</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.912</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.939</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.950</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.927</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.786</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">SVM</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.919</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.843</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.890</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.899</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.881</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.615</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Tree</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.820</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.891</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.925</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.916</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.934</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.724</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254893632" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 13:59:57</span></h1><div class="content">
+<h2>Confusion matrix for Random Forest (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#ededfb; text-align:right; vertical-align:middle;">3783</td>
+<td style="color:#000000; background:#f7dddd; text-align:right; vertical-align:middle;">548</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">818</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">10446</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;601</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">10&nbsp;994</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254895360" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:01</span></h1><div class="content">
+<h2>Confusion matrix for Random Forest (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d0d0f4; text-align:right; vertical-align:middle;">87.3 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">12.7 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">7.3 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">92.7 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;601</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">10&nbsp;994</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254896368" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:05</span></h1><div class="content">
+<h2>Confusion matrix for Tree (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#efeffb; text-align:right; vertical-align:middle;">3371</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">960</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f6d8d8; text-align:right; vertical-align:middle;">744</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">10520</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;115</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;480</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254899104" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:09</span></h1><div class="content">
+<h2>Confusion matrix for Tree (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d5d5f5; text-align:right; vertical-align:middle;">77.8 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">22.2 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">6.6 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">93.4 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;115</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;480</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254898528" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:14</span></h1><div class="content">
+<h2>Confusion matrix for Logistic Regression (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#e8e8fa; text-align:right; vertical-align:middle;">3900</td>
+<td style="color:#000000; background:#fdf5f5; text-align:right; vertical-align:middle;">431</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">2543</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">8721</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">6&nbsp;443</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">9&nbsp;152</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254894352" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:18</span></h1><div class="content">
+<h2>Confusion matrix for Logistic Regression (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">90.0 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">10.0 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">22.6 %</td>
+<td style="color:#000000; background:#d5d5f5; text-align:right; vertical-align:middle;">77.4 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">6&nbsp;443</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">9&nbsp;152</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254896656" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:29</span></h1><div class="content">
+<h2>Confusion matrix for Gradient Boosting (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#ededfb; text-align:right; vertical-align:middle;">3495</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">836</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">827</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">10437</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;322</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;273</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255146848" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:33</span></h1><div class="content">
+<h2>Confusion matrix for Gradient Boosting (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d3d3f5; text-align:right; vertical-align:middle;">80.7 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">19.3 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">7.3 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">92.7 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;322</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;273</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255149872" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:40</span></h1><div class="content">
+<h2>Confusion matrix for Neural Network (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#ededfb; text-align:right; vertical-align:middle;">3463</td>
+<td style="color:#000000; background:#f7dddd; text-align:right; vertical-align:middle;">868</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">1280</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">9984</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;743</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">10&nbsp;852</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255150880" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:44</span></h1><div class="content">
+<h2>Confusion matrix for Neural Network (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d1d1f5; text-align:right; vertical-align:middle;">80.0 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">20.0 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">11.4 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">88.6 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;743</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">10&nbsp;852</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255152464" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:49</span></h1><div class="content">
+<h2>Confusion matrix for SVM (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#efeffb; text-align:right; vertical-align:middle;">3216</td>
+<td style="color:#000000; background:#f5d5d5; text-align:right; vertical-align:middle;">1115</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">1336</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">9928</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;552</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;043</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255153184" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:00:53</span></h1><div class="content">
+<h2>Confusion matrix for SVM (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d5d5f5; text-align:right; vertical-align:middle;">74.3 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">25.7 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;331</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">11.9 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">88.1 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;264</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">4&nbsp;552</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">11&nbsp;043</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">15&nbsp;595</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255151024" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Test and Score <span class="timestamp">Sat May 30 26, 14:00:59</span></h1><div class="content">
+<h2>Settings</h2><ul><b>Sampling type:</b> Stratified 10-fold Cross validation<br><b>Target class:</b> None, show average over classes<br></ul><h2>Scores</h2><table>
+<tbody><tr><th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Model</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">AUC</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">CA</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">F1</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Prec</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Recall</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">MCC</th>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Gradient Boosting</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.956</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.889</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.889</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.889</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.889</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.724</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Logistic Regression</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.896</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.810</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.819</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.856</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.810</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.615</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Neural Network</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.932</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.858</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.859</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.859</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.858</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.648</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Random Forest</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.967</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.908</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.909</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.910</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.908</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.776</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">SVM</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.918</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.842</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.843</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.845</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.842</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.613</td>
+</tr><tr><td style="color:#ffffff; background:#0078d7; text-align:left; vertical-align:middle;">Tree</td>
+<td style="color:#ffffff; background:#0078d7; text-align:right; vertical-align:middle;">0.808</td>
+<td style="color:#ffffff; background:#0078d7; text-align:right; vertical-align:middle;">0.885</td>
+<td style="color:#ffffff; background:#0078d7; text-align:right; vertical-align:middle;">0.884</td>
+<td style="color:#ffffff; background:#0078d7; text-align:right; vertical-align:middle;">0.884</td>
+<td style="color:#ffffff; background:#0078d7; text-align:right; vertical-align:middle;">0.885</td>
+<td style="color:#ffffff; background:#0078d7; text-align:right; vertical-align:middle;">0.710</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254792160" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Test and Score <span class="timestamp">Sat May 30 26, 14:01:05</span></h1><div class="content">
+<h2>Settings</h2><ul><b>Sampling type:</b> Stratified 10-fold Cross validation<br><b>Target class:</b> Sick<br></ul><h2>Scores</h2><table>
+<tbody><tr><th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Model</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">AUC</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">CA</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">F1</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Prec</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">Recall</th>
+<th style="color:black; background:transparent; text-align:left; vertical-align:middle;">MCC</th>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Gradient Boosting</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.956</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.889</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.923</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.925</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.920</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.724</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Logistic Regression</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.896</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.810</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.855</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.952</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.776</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.615</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Neural Network</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.932</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.858</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.902</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.904</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.900</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.648</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Random Forest</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.967</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.908</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.935</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.948</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.923</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.776</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">SVM</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.919</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.842</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.890</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.897</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.883</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.613</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;">Tree</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.808</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.885</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.921</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.913</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.930</td>
+<td style="color:black; background:transparent; text-align:right; vertical-align:middle;">0.710</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254787408" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:23</span></h1><div class="content">
+<h2>Confusion matrix for Random Forest (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#ededfb; text-align:right; vertical-align:middle;">15027</td>
+<td style="color:#000000; background:#f8dede; text-align:right; vertical-align:middle;">2298</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">3448</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">41610</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">18&nbsp;475</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">43&nbsp;908</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254793744" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:27</span></h1><div class="content">
+<h2>Confusion matrix for Random Forest (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d0d0f4; text-align:right; vertical-align:middle;">86.7 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">13.3 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">7.7 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">92.3 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">18&nbsp;475</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">43&nbsp;908</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254791152" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:32</span></h1><div class="content">
+<h2>Confusion matrix for Neural Network (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#efeffb; text-align:right; vertical-align:middle;">13011</td>
+<td style="color:#000000; background:#f4d0d0; text-align:right; vertical-align:middle;">4314</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">4528</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">40530</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;539</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">44&nbsp;844</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255160960" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:41</span></h1><div class="content">
+<h2>Confusion matrix for Neural Network (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d5d5f5; text-align:right; vertical-align:middle;">75.1 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">24.9 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">10.0 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">90.0 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;539</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">44&nbsp;844</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255155632" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:46</span></h1><div class="content">
+<h2>Confusion matrix for Gradient Boosting (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#ededfb; text-align:right; vertical-align:middle;">13974</td>
+<td style="color:#000000; background:#f4d0d0; text-align:right; vertical-align:middle;">3351</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">3590</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">41468</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;564</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">44&nbsp;819</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254892480" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:51</span></h1><div class="content">
+<h2>Confusion matrix for Gradient Boosting (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d3d3f5; text-align:right; vertical-align:middle;">80.7 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">19.3 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">8.0 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">92.0 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;564</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">44&nbsp;819</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255294880" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:01:56</span></h1><div class="content">
+<h2>Confusion matrix for Logistic Regression (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#e8e8fa; text-align:right; vertical-align:middle;">15574</td>
+<td style="color:#000000; background:#fdf5f5; text-align:right; vertical-align:middle;">1751</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">10080</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">34978</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">25&nbsp;654</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">36&nbsp;729</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255295312" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:02:03</span></h1><div class="content">
+<h2>Confusion matrix for Logistic Regression (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">89.9 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">10.1 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">22.4 %</td>
+<td style="color:#000000; background:#d5d5f5; text-align:right; vertical-align:middle;">77.6 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">25&nbsp;654</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">36&nbsp;729</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255296896" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:02:09</span></h1><div class="content">
+<h2>Confusion matrix for Tree (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#efeffb; text-align:right; vertical-align:middle;">13336</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">3989</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f6d8d8; text-align:right; vertical-align:middle;">3166</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">41892</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">16&nbsp;502</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;881</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255298624" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:02:14</span></h1><div class="content">
+<h2>Confusion matrix for Tree (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d6d6f6; text-align:right; vertical-align:middle;">77.0 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">23.0 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">7.0 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">93.0 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">16&nbsp;502</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;881</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345255299776" class="normal" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:02:19</span></h1><div class="content">
+<h2>Confusion matrix for SVM (showing number of instances)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#efeffb; text-align:right; vertical-align:middle;">12780</td>
+<td style="color:#000000; background:#f5d5d5; text-align:right; vertical-align:middle;">4545</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">5287</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">39771</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">18&nbsp;067</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">44&nbsp;316</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div><div id="1345254890176" class="selected" onclick="pybridge._select_item(this.id)"><section class="section"><h1>Confusion Matrix <span class="timestamp">Sat May 30 26, 14:02:23</span></h1><div class="content">
+<h2>Confusion matrix for SVM (showing proportion of actual)</h2><table>
+<tbody><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:center; vertical-align:middle;">Predicted</td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+</tr><tr><td style="color:black; background:transparent; text-align:center; vertical-align:bottom;">Actual</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Healthy</td>
+<td style="color:#000000; background:#d5d5f5; text-align:right; vertical-align:middle;">73.8 %</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">26.2 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">17&nbsp;325</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">Sick</td>
+<td style="color:#000000; background:#f4cece; text-align:right; vertical-align:middle;">11.7 %</td>
+<td style="color:#000000; background:#cecef4; text-align:right; vertical-align:middle;">88.3 %</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">45&nbsp;058</td>
+</tr><tr><td style="color:black; background:transparent; text-align:left; vertical-align:middle;"></td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">∑</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">18&nbsp;067</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">44&nbsp;316</td>
+<td style="color:black; background:transparent; font-weight: bold; text-align:right; vertical-align:middle;">62&nbsp;383</td>
+</tr></tbody></table></div></section>
+
+<div class="textwrapper"><textarea placeholder="Write a comment..." oninput="this.innerHTML = this.value;pybridge._add_comment(this.parentNode.parentNode.id, this.value);"></textarea></div></div></body></html>

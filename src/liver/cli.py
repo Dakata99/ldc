@@ -9,6 +9,7 @@ AVAILABLE_CONFIGS = (
 	"experiment1",
 	"experiment2",
 	"experiment3",
+	"expr3-default" # Tied for experiment 3
 )
 
 
@@ -113,7 +114,7 @@ def main():
 		csv: Path = csvs[idx - 1]
 		filename: str = csv.stem
 		parts = filename.split('-')
-		exprid, config, method = int(parts[0][-1]), parts[1], parts[2]
+		exprid, config, method = int(parts[0][-1]), '-'.join(parts[1:-1]), parts[-1]
 
 		# Plot the results for the specified experiment
 		plot(exprid, method, config)
