@@ -35,16 +35,6 @@ QLabel#api-name {
     padding-left: 6px;
 }
 
-QLabel#badge-orange {
-    color: #7c2d00;
-    background-color: #ffe5c8;
-    border: 1px solid #fdba74;
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 10px;
-    font-weight: bold;
-}
-
 QLabel#badge-python {
     color: #6b3b16;
     background-color: #f5ece0;
@@ -156,6 +146,7 @@ QWidget#toolbar {
 
 QLabel#toolbar-label {
     color: #7a4a1e;
+    background-color: #fff0dc;
     font-size: 12px;
     font-weight: bold;
     letter-spacing: 0.5px;
@@ -235,6 +226,7 @@ QPushButton#btn-run:disabled, QPushButton#btn-secondary:disabled {
 
 QRadioButton#method-radio {
     color: #7a4a1e;
+    background-color: #fff0dc;
     font-size: 13px;
     spacing: 6px;
 }

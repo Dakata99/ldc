@@ -6,7 +6,7 @@ import threading
 import time
 from typing import Any
 
-from AnyQt.QtCore import QThread, Signal, QEvent
+from AnyQt.QtCore import QEvent, QThread, Signal
 
 
 def configured_values_for_sweep(info: dict[str, Any]) -> list[Any]:
@@ -22,15 +22,14 @@ def configured_values_for_sweep(info: dict[str, Any]) -> list[Any]:
     return [info["value"]]
 
 
-def estimate_total_work_units(cfg: dict[str, Any]) -> int:
-    method_multiplier = 5 if cfg.get("method") == "cross_validation" else 1
+def total_learners(cfg: dict[str, Any]) -> int:
     total = 0
 
     for learner_info in cfg.get("learners", {}).values():
         params = learner_info.get("params", learner_info)
         lengths = [len(configured_values_for_sweep(info)) for info in params.values()]
         learner_configs = math.prod(lengths) if lengths else 1
-        total += learner_configs * method_multiplier
+        total += learner_configs
 
     return max(1, total)
 
@@ -57,79 +56,47 @@ class RunThread(QThread):
         self._cancel_event.set()
 
     def run(self) -> None:
-        total = estimate_total_work_units(self.cfg)
-        current = 0
-        start = time.monotonic()
+        exprid = self.cfg['exprid']
+        method = self.cfg['method']
 
-        from Orange.data import Table
+        learners: dict[str, list[dict[Any, Any]]] = {}
+        for learner_key, learner_info in self.cfg.get("learners", {}).items():
+            params = learner_info.get("params", {})
 
-        from liver.experiment import TestAndScore
-        from liver.load import load_configuration
-        from liver.utils import create_learners, root
+            param_names = list(params.keys())
+            sweep_values = [configured_values_for_sweep(params[p]) for p in param_names]
+
+            for combo in itertools.product(*sweep_values):
+                learner_kwargs = dict(zip(param_names, combo, strict=True))
+                learners[learner_key] = learners.get(learner_key, [])
+                learners[learner_key].append(learner_kwargs)
 
         try:
-            config = load_configuration('default')
-            learners = create_learners(config)
+            from liver.experiment import train
 
-            train = Table(str(root("datasets", "expr1", "expr1-train-data.tab")))
-            test = Table(str(root("datasets", "expr1", "expr1-test-data.tab")))
-            ts = TestAndScore(learners)
-            ts.train(train, test, 'totd')
-            # ts.eval(exprid, CSV_FILE.format(experiment=exprid, config=configuration, method=method))
+            start_time = time.monotonic()
+            total = total_learners(self.cfg)
+            current = [0]  # Use list to allow modification in nested function
 
-            # method = self.cfg.get("method", "cross_validation")
-            # folds = 5 if method == "cross_validation" else 1
+            def timer_thread() -> None:
+                """Background thread that emits elapsed time updates every 100ms."""
+                while not self._cancel_event.is_set():
+                    elapsed = time.monotonic() - start_time
+                    self.progress_changed.emit(current[0], total, elapsed, None, 'PROGRESS')
+                    time.sleep(0.1)
 
-            # for learner_key, learner_info in self.cfg.get("learners", {}).items():
-            #     params = learner_info.get("params", {})
-            #     display_name = learner_info.get("display_name", learner_key)
-            #     api_class = learner_info.get("api_class", learner_key)
+            # Start timer thread
+            timer = threading.Thread(target=timer_thread, daemon=True)
+            timer.start()
 
-            #     param_names = list(params.keys())
-            #     sweep_values = [configured_values_for_sweep(params[p]) for p in param_names]
+            def progress_callback(current_count: int, total_count: int, progress: float) -> None:
+                current[0] = current_count
+                elapsed = time.monotonic() - start_time
+                self.progress_changed.emit(current_count, total_count, elapsed, None, 'PROGRESS')
 
-            #     for combo in itertools.product(*sweep_values):
-            #         learner_kwargs = dict(zip(param_names, combo, strict=True))
-
-            #         for fold_idx in range(1, folds + 1):
-            #             if self._cancel_event.is_set():
-            #                 self.run_finished.emit(False, "Run cancelled safely.")
-            #                 return
-
-            #             message = (
-            #                 f"{display_name} ({api_class}) | "
-            #                 f"kwargs={learner_kwargs} | step {fold_idx}/{folds}"
-            #             )
-
-            #             # --------------------------------------------------------------
-            #             # TODO: IMPLEMENT YOUR REAL "RUN" FUNCTIONALITY HERE.
-            #             #
-            #             # At this point you already have correct Python API kwargs.
-            #             # Example:
-            #             #
-            #             #   learner = LogisticRegressionLearner(**learner_kwargs)
-            #             #
-            #             # For the Balance class distribution example, the GUI label is
-            #             # shown as "Balance class distribution", but the kwarg is:
-            #             #
-            #             #   {"class_weight": "balanced"}
-            #             #
-            #             # Keep the work chunked. Check self._cancel_event.is_set()
-            #             # between folds/configurations so Ctrl+C and Cancel can stop
-            #             # cleanly after the current chunk completes.
-            #             # --------------------------------------------------------------
-            #             time.sleep(0.20)
-
-            current += 1
-            elapsed = time.monotonic() - start
-            remaining = None
-            if current > 0:
-                average_per_unit = elapsed / current
-                remaining = max(0.0, average_per_unit * (total - current))
-
-            self.progress_changed.emit(current, total, elapsed, remaining, 'AAAAA')
-
+            train(exprid, method, learners, progress_callback=progress_callback)
+            self._cancel_event.set()  # Stop timer thread
             self.run_finished.emit(True, "Run finished successfully.")
-
         except Exception as exc:  # pragma: no cover - shown in GUI during normal use
+            self._cancel_event.set()  # Stop timer thread
             self.run_finished.emit(False, f"Run failed: {exc}")

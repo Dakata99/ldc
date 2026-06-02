@@ -4,9 +4,9 @@ import json
 import signal
 from typing import Any
 
-from PySide6.QtCore import QTimer
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (
+from AnyQt.QtCore import QTimer
+from AnyQt.QtGui import QFont
+from AnyQt.QtWidgets import (
     QApplication,
     QButtonGroup,
     QFileDialog,
@@ -23,9 +23,21 @@ from PySide6.QtWidgets import (
 )
 
 from .config import LEARNER_PAIRS, LEARNER_SPECS, LearnerSpecs
-from .runner import RunThread, estimate_total_work_units
-from .ui_helpers import format_duration, hline, vline
+from .runner import RunThread, total_learners
+from .ui_helpers import (
+    format_duration,
+    hline,
+)
 from .widgets import ParamBinding, make_learner_block
+
+
+class MethodSelectionError(Exception):
+    """Raised when no method is selected."""
+    pass
+
+class ExperimentSelectionError(Exception):
+    """Raised when no experiment is selected."""
+    pass
 
 
 class MainWindow(QWidget):
@@ -79,7 +91,7 @@ class MainWindow(QWidget):
 
         self.widgets_disabled_during_run = [
             self.btn_load,
-            self.btn_dump,
+            self.btn_save,
             self.rb_cv,
             self.rb_holdout,
             self.learner_container,
@@ -95,7 +107,7 @@ class MainWindow(QWidget):
         toolbar_layout.setContentsMargins(16, 10, 16, 10)
         toolbar_layout.setSpacing(10)
 
-        cfg_label = QLabel("CONFIG")
+        cfg_label = QLabel("Config")
         cfg_label.setObjectName("toolbar-label")
         toolbar_layout.addWidget(cfg_label)
 
@@ -103,12 +115,12 @@ class MainWindow(QWidget):
         self.btn_load.setObjectName("btn-secondary")
         self.btn_load.setToolTip("Load a saved configuration from a JSON file")
 
-        self.btn_dump = QPushButton("⬇  Dump")
-        self.btn_dump.setObjectName("btn-secondary")
-        self.btn_dump.setToolTip("Save the current configuration to a JSON file")
+        self.btn_save = QPushButton("⬇  Save")
+        self.btn_save.setObjectName("btn-secondary")
+        self.btn_save.setToolTip("Save the current configuration to a JSON file")
 
         toolbar_layout.addWidget(self.btn_load)
-        toolbar_layout.addWidget(self.btn_dump)
+        toolbar_layout.addWidget(self.btn_save)
 
         sep1 = QFrame()
         sep1.setFrameShape(QFrame.Shape.VLine)
@@ -118,23 +130,65 @@ class MainWindow(QWidget):
         toolbar_layout.addWidget(sep1)
         toolbar_layout.addSpacing(6)
 
-        method_label = QLabel("METHOD")
+        # Experiment section
+        experiment_label = QLabel("Experiment")
+        experiment_label.setObjectName("toolbar-label")
+        toolbar_layout.addWidget(experiment_label)
+        
+        self.experiment_group = QButtonGroup(self)
+
+        self.rb_1 = QRadioButton("Multiclass (1)")
+        self.rb_1.setObjectName("method-radio")
+        self.rb_1.setToolTip('Multiclass classification for Indian dataset')
+
+        self.rb_2 = QRadioButton("Binary (2)")
+        self.rb_2.setObjectName("method-radio")
+        self.rb_2.setToolTip('Binary classification for Indian dataset')
+
+        self.rb_3 = QRadioButton("Binary (3)")
+        self.rb_3.setObjectName("method-radio")
+        self.rb_3.setToolTip('Binary classification for all 3 datasets')
+        
+        self.experiment_group.addButton(self.rb_1, 0)
+        self.experiment_group.addButton(self.rb_2, 1)
+        self.experiment_group.addButton(self.rb_3, 2)
+
+        toolbar_layout.addWidget(self.rb_1)
+        toolbar_layout.addWidget(self.rb_2)
+        toolbar_layout.addWidget(self.rb_3)
+        toolbar_layout.addStretch()
+
+        # Separator
+        sep2 = QFrame()
+        sep2.setFrameShape(QFrame.Shape.VLine)
+        sep2.setObjectName("vline")
+        sep2.setFixedHeight(28)
+        toolbar_layout.addSpacing(6)
+        toolbar_layout.addWidget(sep2)
+        toolbar_layout.addSpacing(6)
+
+        # Method section
+        method_label = QLabel("Method")
         method_label.setObjectName("toolbar-label")
         toolbar_layout.addWidget(method_label)
 
         self.method_group = QButtonGroup(self)
-        self.rb_cv = QRadioButton("Cross-Validation")
+        self.rb_cv = QRadioButton("Cross validation")
         self.rb_cv.setObjectName("method-radio")
-        self.rb_holdout = QRadioButton("Hold-Out")
+        self.rb_holdout = QRadioButton("Hold-out")
         self.rb_holdout.setObjectName("method-radio")
         self.method_group.addButton(self.rb_cv, 0)
         self.method_group.addButton(self.rb_holdout, 1)
-        self.rb_cv.setChecked(True)
 
         toolbar_layout.addWidget(self.rb_cv)
         toolbar_layout.addWidget(self.rb_holdout)
         toolbar_layout.addStretch()
 
+        self.learners_count = QLabel("#Learners: 0")
+        self.learners_count.setObjectName("toolbar-label")
+        toolbar_layout.addWidget(self.learners_count)
+
+        # Running section
         self.btn_run = QPushButton("▶  RUN")
         self.btn_run.setObjectName("btn-run")
         self.btn_run.setToolTip("Run with the current configuration")
@@ -202,7 +256,7 @@ class MainWindow(QWidget):
     # ------------------------------------------------------------------
     def _connect_signals(self) -> None:
         self.btn_load.clicked.connect(self.on_load)
-        self.btn_dump.clicked.connect(self.on_dump)
+        self.btn_save.clicked.connect(self.on_dump)
         self.btn_run.clicked.connect(self.on_run_clicked)
 
     def _install_sigint_handler(self) -> None:
@@ -215,9 +269,23 @@ class MainWindow(QWidget):
 
     def collect_config(self) -> dict[str, Any]:
         """Return current UI state. Parent keys are learner IDs and API parameter names."""
+        
+        if not (
+            self.rb_1.isChecked() or
+            self.rb_2.isChecked() or
+            self.rb_3.isChecked()
+        ):
+            raise ExperimentSelectionError("Please select an experiment: Multiclass (1), Binary (2), or Binary (3).")
+        elif not (
+            self.rb_cv.isChecked() or
+            self.rb_holdout.isChecked()
+        ):
+            raise MethodSelectionError("Please select an evaluation method: Cross validation or Hold-out.")
+
         cfg: dict[str, Any] = {
             "schema_version": 2,
-            "method": "cross_validation" if self.rb_cv.isChecked() else "hold_out",
+            "exprid": int(self.experiment_group.checkedId() + 1),
+            "method": "cross-validation" if self.rb_cv.isChecked() else "hold-out",
             "learners": {},
         }
 
@@ -226,7 +294,6 @@ class MainWindow(QWidget):
             cfg["learners"][learner_key] = {
                 "display_name": learner_spec.get("display_name", learner_key),
                 "api_class": learner_spec.get("api_class"),
-                "orange_widget": learner_spec.get("orange_widget"),
                 "params": {},
             }
 
@@ -237,8 +304,8 @@ class MainWindow(QWidget):
 
     def apply_config(self, cfg: dict[str, Any]) -> None:
         """Apply a loaded config dict back to the UI widgets."""
-        method = cfg.get("method", "cross_validation")
-        (self.rb_cv if method == "cross_validation" else self.rb_holdout).setChecked(True)
+        method = cfg.get("method", "cross-validation")
+        (self.rb_cv if method == "cross-validation" else self.rb_holdout).setChecked(True)
 
         for learner_key, learner_info in cfg.get("learners", {}).items():
             if learner_key not in self.param_bindings:
@@ -324,19 +391,27 @@ class MainWindow(QWidget):
     def start_run(self) -> None:
         try:
             cfg = self.collect_config()
+        except ExperimentSelectionError as exc:
+            QMessageBox.critical(self, "Experiment not selected", str(exc))
+            return
+        except MethodSelectionError as exc:
+            QMessageBox.critical(self, "Method not selected", str(exc))
+            return
         except Exception as exc:
             QMessageBox.critical(self, "Invalid configuration", str(exc))
             return
 
-        total = estimate_total_work_units(cfg)
-        self.progress_bar.setRange(0, total)
+        num_learners = total_learners(cfg)
+        self.progress_bar.setRange(0, num_learners)
         self.progress_bar.setValue(0)
-        self.progress_bar.setFormat(f"0%  (0/{total})")
+        self.progress_bar.setFormat(f"0%  (0/{num_learners})")
         self.elapsed_label.setText("Elapsed: 00:00")
         self.remaining_label.setText("Remaining: estimating...")
         self.status_label.setText("Starting run...")
 
         self.set_running_state(True)
+
+        self.learners_count.setText(f"#Learners: {num_learners}")
 
         self.run_thread = RunThread(cfg)
         self.run_thread.progress_changed.connect(self.on_progress)

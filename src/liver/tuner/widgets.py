@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
+from AnyQt.QtCore import Qt
+from AnyQt.QtWidgets import (
     QButtonGroup,
     QHBoxLayout,
     QLabel,
@@ -55,8 +55,7 @@ class ParamBinding:
             "mode": self.mode(),
             "value": self.value(),
             "api_param": self.api_param_name,
-            "orange_opt": self.spec.get("orange_opt"),
-            "exposed_in_orange": self.spec.get("exposed_in_orange", False),
+            "orange": self.spec.get("orange"),
             "type": self.spec.get("type", "unknown"),
         }
 
@@ -76,17 +75,25 @@ class ParamBinding:
 
 
 def make_section_header() -> QWidget:
-    left_label = QLabel("DEFAULT")
+    left_label = QLabel("Parameter")
     left_label.setObjectName("section-label")
     left_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    right_label = QLabel("MANUAL VALUES")
+    middle = QLabel("Default values")
+    middle.setObjectName("section-label")
+    middle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    right_label = QLabel("Manual values")
     right_label.setObjectName("section-label")
     right_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     left = QHBoxLayout()
     left.setContentsMargins(8, 0, 8, 0)
     left.addWidget(left_label)
+
+    mid = QHBoxLayout()
+    mid.setContentsMargins(8, 0, 8, 0)
+    mid.addWidget(middle)
 
     right = QHBoxLayout()
     right.setContentsMargins(8, 0, 8, 0)
@@ -96,13 +103,17 @@ def make_section_header() -> QWidget:
     left_widget.setLayout(left)
     right_widget = QWidget()
     right_widget.setLayout(right)
+    middle_widget = QWidget()
+    middle_widget.setLayout(mid)
 
     row = QHBoxLayout()
     row.setContentsMargins(0, 0, 0, 0)
     row.setSpacing(0)
-    row.addWidget(left_widget, 1)
+    row.addWidget(left_widget, 3)
     row.addWidget(vline())
-    row.addWidget(right_widget, 1)
+    row.addWidget(middle_widget, 1)
+    row.addWidget(vline())
+    row.addWidget(right_widget, 2)
 
     widget = QWidget()
     widget.setObjectName("section-header")
@@ -112,37 +123,36 @@ def make_section_header() -> QWidget:
 
 def make_param_label_block(api_param_name: str, spec: dict[str, Any]) -> QWidget:
     display_label = parameter_display_label(api_param_name, spec)
-    exposed = bool(spec.get("exposed_in_orange", False))
+    exposed = bool(spec.get("orange", False))
 
-    param_lbl = QLabel(f"{display_label}:")
+    param_lbl = QLabel(f"{display_label} ({api_param_name}):" if exposed else api_param_name)
     param_lbl.setObjectName("param-name")
     param_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
     param_lbl.setToolTip(spec.get("description", ""))
 
-    api_lbl = QLabel(f"api: {api_param_name}")
-    api_lbl.setObjectName("api-name")
-
-    badge = QLabel("ORANGE" if exposed else "PYTHON")
-    badge.setObjectName("badge-orange" if exposed else "badge-python")
-    badge.setToolTip("Visible in Orange GUI" if exposed else "Python API only / not directly exposed in Orange GUI")
+    # If in Python API only, add a badge to indicate that.
+    if not exposed:
+        badge = QLabel("PYTHON")
+        badge.setObjectName("badge-python")
+        badge.setToolTip("Python API only / not directly exposed in Orange GUI")
 
     second_line = QHBoxLayout()
     second_line.setContentsMargins(0, 0, 0, 0)
-    second_line.setSpacing(6)
-    second_line.addWidget(api_lbl)
-    second_line.addWidget(badge)
+    second_line.setSpacing(1)
+    if not exposed:
+        second_line.addWidget(badge)
+    second_line.addWidget(param_lbl)
     second_line.addStretch()
 
     layout = QVBoxLayout()
     layout.setContentsMargins(0, 0, 0, 0)
     layout.setSpacing(1)
-    layout.addWidget(param_lbl)
     layout.addLayout(second_line)
 
     block = QWidget()
     block.setObjectName("param-label-block")
     block.setLayout(layout)
-    block.setFixedWidth(240)
+    block.setFixedWidth(360)
     return block
 
 
@@ -187,18 +197,30 @@ def make_param_row(
     btn_group.idClicked.connect(on_mode_changed)
     rb_default.setChecked(True)
 
+    # Left boxt (parameters labels and badges)
     left = QHBoxLayout()
     left.setContentsMargins(8, 5, 8, 5)
     left.setSpacing(10)
-    left.addWidget(rb_default)
     left.addWidget(label_block)
-    left.addWidget(default_label)
     left.addStretch()
 
     left_widget = QWidget()
     left_widget.setLayout(left)
     left_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
+    # Middle box (default values)
+    middle = QHBoxLayout()
+    middle.setContentsMargins(8, 5, 8, 5)
+    middle.setSpacing(10)
+    middle.addWidget(rb_default)
+    middle.addWidget(default_label)
+    middle.addStretch()
+
+    middle_widget = QWidget()
+    middle_widget.setLayout(middle)
+    middle_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+    # Right box (manual values)
     right = QHBoxLayout()
     right.setContentsMargins(8, 5, 8, 5)
     right.setSpacing(10)
@@ -210,12 +232,15 @@ def make_param_row(
     right_widget.setLayout(right)
     right_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
+    # Main box
     row = QHBoxLayout()
     row.setContentsMargins(0, 0, 0, 0)
     row.setSpacing(0)
-    row.addWidget(left_widget, 1)
+    row.addWidget(left_widget, 3)
     row.addWidget(vline())
-    row.addWidget(right_widget, 1)
+    row.addWidget(middle_widget, 1)
+    row.addWidget(vline())
+    row.addWidget(right_widget, 2)
 
     row_widget = QWidget()
     row_widget.setObjectName("param-row")
@@ -249,7 +274,7 @@ def make_learner_block(
     outer.setContentsMargins(14, 12, 14, 14)
     outer.setSpacing(0)
 
-    title = QLabel(f"{learner_key} — {display_name}")
+    title = QLabel(f"{display_name}")
     title.setObjectName("learner-title")
     title.setToolTip(f"Python API class: {api_class}")
     outer.addWidget(title)
@@ -273,8 +298,75 @@ def make_learner_block(
         if i < len(params) - 1:
             outer.addWidget(hline())
 
+    combinations_label = QLabel("Number of combination: ")
+    combinations_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+    outer.addWidget(combinations_label)
+
     block_widget = QWidget()
     block_widget.setObjectName("learner-block")
     block_widget.setLayout(outer)
     block_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
     return block_widget
+
+
+class LearnerBlock:
+    def __init__(self):
+        self._header = None
+        self._param_label_block = None
+        self._param_rows = None
+
+    def _build_header(self):
+        # Left box - parameter labels
+        left_label = QLabel("Parameter")
+        left_label.setObjectName("section-label")
+        left_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        left = QHBoxLayout()
+        left.setContentsMargins(8, 0, 8, 0)
+        left.addWidget(left_label)
+
+        # Middle box - default values
+        middle_label = QLabel("Default values")
+        middle_label.setObjectName("section-label")
+        middle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        middle = QHBoxLayout()
+        middle.setContentsMargins(8, 0, 8, 0)
+        middle.addWidget(middle_label)
+
+        # Right box - manual values
+        right_label = QLabel("Manual values")
+        right_label.setObjectName("section-label")
+        right_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        right = QHBoxLayout()
+        right.setContentsMargins(8, 0, 8, 0)
+        right.addWidget(right_label)
+
+        # Whole box
+        left_widget = QWidget()
+        left_widget.setLayout(left)
+        right_widget = QWidget()
+        right_widget.setLayout(right)
+        middle_widget = QWidget()
+        middle_widget.setLayout(middle)
+
+        # Whole box
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(0)
+        row.addWidget(left_widget, 3)
+        row.addWidget(vline())
+        row.addWidget(middle_widget, 1)
+        row.addWidget(vline())
+        row.addWidget(right_widget, 2)
+
+        self._header = QWidget()
+        self._header.setObjectName("section-header")
+        self._header.setLayout(row)
+
+    def _build_param_label_block(self):
+        pass
+
+    def _build_param_rows(self):
+        pass

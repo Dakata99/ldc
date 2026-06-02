@@ -38,25 +38,50 @@ class TestAndScore:
         )
         self._scores = None
 
-    @profiler
-    def train(self, train: Table, test: Table, method: str) -> None:
-        """Method for training learnears."""
-        # Evaluate models with the chosen method
-        if method == "cv":
-            logger.info(f"CrossValidation: evaluating {len(self._learners)} learners...")
+	@profiler
+	def train(self, train: Table, test: Table, method: str, progress_callback=None):
+		"""Method for training learnears."""
+		# Evaluate models with the chosen method
+		if method == 'cross-validation':
+			logger.info(f"CrossValidation: evaluating {len(self._learners)} learners...")
+			def cv_progress_callback(progress: float) -> None:
+				logger.info("Progress: {}%", round(progress * 100, 1))
+				if progress_callback:
+					# CrossValidation: report as percentage (25/100)
+					current = round(progress * 100)
+					progress_callback(current, 100, progress)
 
-            def progress_callback(progress: float) -> None:
-                logger.info("Progress: {}%", round(progress * 100, 1))
+			cv = CrossValidation()
+			self._scores = cv(
+				train,
+				self._learners,
+				preprocessor=self._preprocessor,
+				callback=cv_progress_callback,
+			) # type: ignore
+		else:
+			logger.info(f"TestOnTestData: evaluating {len(self._learners)} learners...")
+			# Evaluate using TestOnTestData (train on train set, test on test set)
+			def totd_progress_callback(progress: float) -> None:
+				done = round(progress * len(self._learners))
+				logger.info(
+					"Finished {}/{} learners ({:.2f}%)",
+					done,
+					len(self._learners),
+					progress * 100,
+				)
+				if progress_callback:
+					# TestOnTestData: report as learner count (3/6)
+					progress_callback(done, len(self._learners), progress)
 
-            cv = CrossValidation()
-            self._scores = cv(
-                train,
-                self._learners,
-                preprocessor=self._preprocessor,
-                callback=progress_callback,
-            )
-        else:
-            logger.info(f"TestOnTestData: evaluating {len(self._learners)} learners...")
+			# Set store_data to True if we want to keep the augmented data with predictions, probabilities, etc.
+			evaluator = TestOnTestData(store_data=False)
+			self._scores = evaluator(
+				train,
+				test,
+				self._learners,
+				preprocessor=self._preprocessor,
+				callback=totd_progress_callback,
+			)  # type: ignore
 
             # Evaluate using TestOnTestData (train on train set, test on test set)
             def progress_callback(progress: float) -> None:
@@ -137,9 +162,47 @@ class TestAndScore:
         df.to_csv(OUTPUT_DIR / output_filename, index=False)
 
 
-def main(exprid: int, method: str, learners_group: list[str], configuration: str = "default") -> None:
-    """Main function for evaluation an experiment."""
-    logger.info(f"Running experiment: {EXPERIMENTS[exprid]}")
+def train(exprid: int, method: str, learners: dict, progress_callback=None) -> None:
+	"""Main function for evaluation an experiment."""
+	from Orange.classification import (
+		GBClassifier,
+		LogisticRegressionLearner,
+		NNClassificationLearner,
+		RandomForestLearner,
+		SVMLearner,
+		TreeLearner,
+	)
+	logger.info(f"Running experiment: {EXPERIMENTS[exprid]}")
+
+	# 1) Load train, test data
+	train = Table(str(root("datasets", f"expr{exprid}", f"expr{exprid}-train-data.tab")))
+	test = Table(str(root("datasets", f"expr{exprid}", f"expr{exprid}-test-data.tab")))
+
+	# 2) Load configuration and create learners
+	mapping = {
+		"LR": LogisticRegressionLearner,
+		"DT": TreeLearner,
+		"RF": RandomForestLearner,
+		"GB": GBClassifier,
+		"NN": NNClassificationLearner,
+		"SVM": SVMLearner,
+	}
+	learners_to_eval = []
+	for learner_key, configs in learners.items():
+		print(f"{learner_key} has {len(configs)} configurations: {configs}")
+		if learner_key in mapping:
+			learners_to_eval.extend(mapping[learner_key](**config) for config in configs)
+	logger.debug(learners_to_eval)
+
+	# 3) Evaluate
+	ts = TestAndScore(learners_to_eval)
+	ts.train(train, test, method, progress_callback=progress_callback)
+	ts.eval(exprid, CSV_FILE.format(experiment=exprid, config='GUI', method=method))
+
+
+def main(exprid: int, method: str, learners_group: list, configuration: str = "default") -> None:
+	"""Main function for evaluation an experiment."""
+	logger.info(f"Running experiment: {EXPERIMENTS[exprid]}")
 
     # 1) Load train, test data
     train = Table(str(root("datasets", f"expr{exprid}", f"expr{exprid}-train-data.tab")))

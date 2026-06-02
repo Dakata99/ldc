@@ -4,7 +4,7 @@ import json
 import math
 from typing import Any
 
-from PySide6.QtWidgets import QFrame
+from AnyQt.QtWidgets import QFrame
 
 
 def vline() -> QFrame:
@@ -68,4 +68,4 @@ def parse_manual_list(raw: str, *, learner_name: str, param_name: str) -> list[A
 
 def parameter_display_label(api_param_name: str, spec: dict[str, Any]) -> str:
     """Prefer Orange GUI label; fall back to the Python API parameter name."""
-    return spec.get("orange_opt") or api_param_name
+    return spec.get("orange") or api_param_name
