@@ -3,11 +3,14 @@
 # Liver disease exploratory data analysis.
 #
 
+PROMPT=ldc
+VENV=.$PROMPT
+
 # Create virtual environment.
-uv venv --prompt ldc --clear
+uv venv $VENV --prompt $PROMPT --clear
 
 # Activate virtual environment.
-source .venv/bin/activate
+source $VENV/bin/activate
 
 # Install dependencies.
 uv pip install -e . --quiet

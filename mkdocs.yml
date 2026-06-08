@@ -1,0 +1,20 @@
+INHERIT: .mkdocs.base.yml
+
+site_name: Liver Disease Classification
+site_description: Portfolio of machine learning experiments for liver disease classification using Orange3 & Python.
+site_url: https://ldc-docs.github.io/
+
+repo_url: https://github.com/Dakata99/ldc
+repo_name: Dakata99/ldc
+
+docs_dir: docs
+
+nav:
+    - Home: index.md
+    - Orange-Python mapping:
+        - Logistic Regression: orange-python-mapping/logistic-regression.md
+        - Random Forest: orange-python-mapping/random-forest.md
+        - Support Vector Machine: orange-python-mapping/svm.md
+        - Gradient Boosting: orange-python-mapping/gradient-boosting.md
+        - Neural Network: orange-python-mapping/neural-network.md
+        - Tree: orange-python-mapping/tree.md
