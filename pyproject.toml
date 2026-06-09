@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ldc"
-version = "2.1.0"
+version = "3.0.0"
 description = "Experimental machine learning study for liver disease classification using Orange3 & Python"
 requires-python = ">=3.11"
 
@@ -26,11 +26,11 @@ dependencies = [
 
 [project.scripts]
 liver = "liver.cli:main"
-liver-app = "liver.app:main"
+ltuner = "liver.gui:main"
 
 [tool.bumpversion]
-current_version = "2.1.0"
-commit = true
+current_version = "3.0.0"
+commit = false
 tag = true
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]

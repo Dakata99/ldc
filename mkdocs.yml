@@ -18,3 +18,5 @@ nav:
         - Gradient Boosting: orange-python-mapping/gradient-boosting.md
         - Neural Network: orange-python-mapping/neural-network.md
         - Tree: orange-python-mapping/tree.md
+    - CLI: cli.md
+    - GUI: gui.md

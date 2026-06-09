@@ -6,7 +6,7 @@ import threading
 import time
 from typing import Any
 
-from AnyQt.QtCore import QEvent, QThread, Signal
+from AnyQt.QtCore import QThread, Signal
 
 
 def configured_values_for_sweep(info: dict[str, Any]) -> list[Any]:
@@ -26,6 +26,10 @@ def total_learners(cfg: dict[str, Any]) -> int:
     total = 0
 
     for learner_info in cfg.get("learners", {}).values():
+        # Skip disabled learners
+        if not learner_info.get("enabled", True):
+            continue
+
         params = learner_info.get("params", learner_info)
         lengths = [len(configured_values_for_sweep(info)) for info in params.values()]
         learner_configs = math.prod(lengths) if lengths else 1
@@ -61,6 +65,10 @@ class RunThread(QThread):
 
         learners: dict[str, list[dict[Any, Any]]] = {}
         for learner_key, learner_info in self.cfg.get("learners", {}).items():
+            # Skip disabled learners
+            if not learner_info.get("enabled", True):
+                continue
+
             params = learner_info.get("params", {})
 
             param_names = list(params.keys())

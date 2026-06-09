@@ -8,8 +8,9 @@ def run_analysis(
     # Run the experiment
     experiment(exprid, method, learners_group, config)
 
-	# Plot the results
-	plot(exprid, method, config)
+    # Plot the results
+    plot(exprid, method, config)
 
-def run(exprid: int, method: str, learners: dict):
-	pass
+
+def run(exprid: int, method: str, learners: dict) -> None:
+    pass

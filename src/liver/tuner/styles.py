@@ -3,11 +3,11 @@ QWidget {
     background-color: #fdf6ee;
     color: #2c1a00;
     font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    font-size: 13px;
+    font-size: 18px;
 }
 
 QLabel#learner-title {
-    font-size: 15px;
+    font-size: 32px;
     font-weight: bold;
     color: #c45000;
     letter-spacing: 1px;
@@ -16,7 +16,7 @@ QLabel#learner-title {
 
 QLabel#section-label {
     color: #7a4a1e;
-    font-size: 11px;
+    font-size: 24px;
     font-weight: bold;
     letter-spacing: 1px;
     padding: 4px 0px;
@@ -24,31 +24,14 @@ QLabel#section-label {
 
 QLabel#param-name {
     color: #7a4a1e;
-    font-size: 13px;
+    font-size: 22px;
     padding-left: 6px;
-}
-
-QLabel#api-name {
-    color: #a06030;
-    font-size: 11px;
-    font-family: 'Consolas', 'Fira Code', monospace;
-    padding-left: 6px;
-}
-
-QLabel#badge-python {
-    color: #6b3b16;
-    background-color: #f5ece0;
-    border: 1px solid #ddc9ae;
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 10px;
-    font-weight: bold;
 }
 
 QLabel#default-value {
     color: #7c2d00;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 18px;
     padding: 2px 8px;
     background-color: #ffe5c8;
     border: 1px solid #f97316;
@@ -69,7 +52,7 @@ QLineEdit {
     border-radius: 5px;
     padding: 4px 10px;
     font-family: 'Consolas', 'Fira Code', monospace;
-    font-size: 12px;
+    font-size: 18px;
     min-width: 220px;
 }
 
@@ -87,7 +70,7 @@ QLineEdit:disabled {
 QRadioButton {
     color: #a35c2a;
     spacing: 6px;
-    font-size: 12px;
+    font-size: 18px;
 }
 
 QRadioButton::indicator {
@@ -147,20 +130,20 @@ QWidget#toolbar {
 QLabel#toolbar-label {
     color: #7a4a1e;
     background-color: #fff0dc;
-    font-size: 12px;
+    font-size: 18px;
     font-weight: bold;
     letter-spacing: 0.5px;
 }
 
 QLabel#status-label {
     color: #7a4a1e;
-    font-size: 12px;
+    font-size: 18px;
     font-weight: bold;
 }
 
 QLabel#time-label {
     color: #a06030;
-    font-size: 12px;
+    font-size: 18px;
     font-family: 'Consolas', 'Fira Code', monospace;
 }
 
@@ -180,7 +163,7 @@ QProgressBar::chunk {
 }
 
 QPushButton {
-    font-size: 13px;
+    font-size: 18px;
     font-weight: bold;
     border-radius: 6px;
     padding: 6px 18px;
@@ -206,7 +189,7 @@ QPushButton#btn-run {
     background-color: #ea580c;
     color: #ffffff;
     padding: 7px 32px;
-    font-size: 14px;
+    font-size: 18px;
     letter-spacing: 1px;
 }
 
@@ -227,7 +210,7 @@ QPushButton#btn-run:disabled, QPushButton#btn-secondary:disabled {
 QRadioButton#method-radio {
     color: #7a4a1e;
     background-color: #fff0dc;
-    font-size: 13px;
+    font-size: 22px;
     spacing: 6px;
 }
 
@@ -256,5 +239,10 @@ QRadioButton#method-radio::indicator:hover {
 QScrollArea {
     border: none;
     background-color: #fdf6ee;
+}
+
+QCheckBox#check-box::indicator {
+    width: 32px;
+    height: 32px;
 }
 """

@@ -82,8 +82,8 @@ def main() -> None:
     # Set up logging
     setup_logging(args.debug)
 
-	# Method for evaluation, hold-out = test on test data
-	method = 'cross-validation' if args.cross_validation else 'hold-out'
+    # Method for evaluation, hold-out = test on test data
+    method = "cross-validation" if args.cross_validation else "hold-out"
 
     if args.experiment and not args.plot_only and not args.iplot:
         # Run the analysis for the specified experiment

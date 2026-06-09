@@ -22,13 +22,13 @@ from AnyQt.QtWidgets import (
     QWidget,
 )
 
-from .config import LEARNER_PAIRS, LEARNER_SPECS, LearnerSpecs
-from .runner import RunThread, total_learners
+from .config import LEARNER_SPECS, LearnerSpecs
+from .runner import RunThread
 from .ui_helpers import (
     format_duration,
     hline,
 )
-from .widgets import ParamBinding, make_learner_block
+from .widgets import LearnerBlock, ParamBinding
 
 
 class MethodSelectionError(Exception):
@@ -45,6 +45,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.learner_specs = learner_specs or LEARNER_SPECS
         self.param_bindings: dict[str, dict[str, ParamBinding]] = {}
+        self.learner_blocks: dict[str, LearnerBlock] = {}
         self.run_thread: RunThread | None = None
         self.is_running = False
         self.is_cancelling = False
@@ -64,17 +65,6 @@ class MainWindow(QWidget):
         main_layout.setContentsMargins(24, 20, 24, 20)
         main_layout.setSpacing(14)
 
-        header = QLabel("Learner Parameter Tuner")
-        header.setFont(QFont("Segoe UI", 18, QFont.Weight.Bold))
-        header.setStyleSheet("color: #c45000; letter-spacing: 1px; padding-bottom: 2px;")
-        main_layout.addWidget(header)
-
-        subtitle = QLabel("Configure typed defaults or JSON-list manual sweep values per learner")
-        subtitle.setStyleSheet("color: #a06030; font-size: 12px; padding-bottom: 6px;")
-        main_layout.addWidget(subtitle)
-
-        main_layout.addWidget(hline(section=True))
-
         toolbar = self._build_toolbar()
         main_layout.addWidget(toolbar)
 
@@ -88,6 +78,9 @@ class MainWindow(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(self.learner_container)
         main_layout.addWidget(scroll_area, 1)
+
+        # Initial update of toolbar learners count
+        self.update_toolbar_learners_count()
 
         self.widgets_disabled_during_run = [
             self.btn_load,
@@ -135,8 +128,6 @@ class MainWindow(QWidget):
         experiment_label.setObjectName("toolbar-label")
         toolbar_layout.addWidget(experiment_label)
         
-        self.experiment_group = QButtonGroup(self)
-
         self.rb_1 = QRadioButton("Multiclass (1)")
         self.rb_1.setObjectName("method-radio")
         self.rb_1.setToolTip('Multiclass classification for Indian dataset')
@@ -149,6 +140,7 @@ class MainWindow(QWidget):
         self.rb_3.setObjectName("method-radio")
         self.rb_3.setToolTip('Binary classification for all 3 datasets')
         
+        self.experiment_group = QButtonGroup(self)
         self.experiment_group.addButton(self.rb_1, 0)
         self.experiment_group.addButton(self.rb_2, 1)
         self.experiment_group.addButton(self.rb_3, 2)
@@ -217,14 +209,9 @@ class MainWindow(QWidget):
         self.elapsed_label.setObjectName("time-label")
         self.elapsed_label.setMinimumWidth(120)
 
-        self.remaining_label = QLabel("Remaining: --:--")
-        self.remaining_label.setObjectName("time-label")
-        self.remaining_label.setMinimumWidth(160)
-
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.progress_bar, 1)
         status_layout.addWidget(self.elapsed_label)
-        status_layout.addWidget(self.remaining_label)
         status_panel.setLayout(status_layout)
         return status_panel
 
@@ -234,17 +221,26 @@ class MainWindow(QWidget):
         learner_layout.setContentsMargins(0, 0, 0, 0)
         learner_layout.setSpacing(14)
 
-        for r, (left_key, right_key) in enumerate(LEARNER_PAIRS):
+        for r, learner in enumerate(LEARNER_SPECS.keys()):
             row = QHBoxLayout()
             row.setSpacing(14)
-            row.addWidget(make_learner_block(left_key, self.learner_specs[left_key], self.param_bindings))
-            row.addWidget(make_learner_block(right_key, self.learner_specs[right_key], self.param_bindings))
+            learner_block = LearnerBlock(
+                learner,
+                self.learner_specs[learner],
+                self.param_bindings,
+                on_combinations_changed=self.update_toolbar_learners_count
+            )
+            row.addWidget(learner_block)
+            self.learner_blocks[learner] = learner_block
+
+            # Connect enable checkbox changes to update toolbar count
+            learner_block.enable_checkbox.stateChanged.connect(self.update_toolbar_learners_count)
 
             row_widget = QWidget()
             row_widget.setLayout(row)
             learner_layout.addWidget(row_widget)
 
-            if r < len(LEARNER_PAIRS) - 1:
+            if r < len(LEARNER_SPECS.keys()) - 1:
                 learner_layout.addWidget(hline(section=True))
 
         learner_layout.addStretch()
@@ -259,6 +255,19 @@ class MainWindow(QWidget):
         self.btn_save.clicked.connect(self.on_dump)
         self.btn_run.clicked.connect(self.on_run_clicked)
 
+    def update_toolbar_learners_count(self) -> None:
+        """Update the learners count in the toolbar based on current UI state."""
+        try:
+            cfg = self.collect_config()
+            num_learners = self.get_enabled_learners_count(cfg)
+            self.learners_count.setText(f"#Learners: {num_learners}")
+        except ValueError:
+            # Invalid JSON in manual inputs - show error state
+            self.learners_count.setText("#Learners: invalid input")
+        except Exception:
+            # If config is incomplete, just don't update
+            pass
+
     def _install_sigint_handler(self) -> None:
         signal.signal(signal.SIGINT, self.handle_sigint)
 
@@ -267,9 +276,27 @@ class MainWindow(QWidget):
         self.signal_timer.start(200)
         self.signal_timer.timeout.connect(lambda: None)
 
+    def get_enabled_learners_count(self, cfg: dict[str, Any]) -> int:
+        """Count total combinations only for enabled learners."""
+        import math
+        total = 0
+
+        for learner_key, learner_info in cfg.get("learners", {}).items():
+            # Skip disabled learners
+            if not learner_info.get("enabled", True):
+                continue
+
+            params = learner_info.get("params", learner_info)
+            from .runner import configured_values_for_sweep
+            lengths = [len(configured_values_for_sweep(info)) for info in params.values()]
+            learner_configs = math.prod(lengths) if lengths else 1
+            total += learner_configs
+
+        return max(1, total)
+
     def collect_config(self) -> dict[str, Any]:
         """Return current UI state. Parent keys are learner IDs and API parameter names."""
-        
+
         if not (
             self.rb_1.isChecked() or
             self.rb_2.isChecked() or
@@ -283,7 +310,6 @@ class MainWindow(QWidget):
             raise MethodSelectionError("Please select an evaluation method: Cross validation or Hold-out.")
 
         cfg: dict[str, Any] = {
-            "schema_version": 2,
             "exprid": int(self.experiment_group.checkedId() + 1),
             "method": "cross-validation" if self.rb_cv.isChecked() else "hold-out",
             "learners": {},
@@ -294,6 +320,7 @@ class MainWindow(QWidget):
             cfg["learners"][learner_key] = {
                 "display_name": learner_spec.get("display_name", learner_key),
                 "api_class": learner_spec.get("api_class"),
+                "enabled": self.learner_blocks[learner_key].is_enabled(),
                 "params": {},
             }
 
@@ -304,12 +331,17 @@ class MainWindow(QWidget):
 
     def apply_config(self, cfg: dict[str, Any]) -> None:
         """Apply a loaded config dict back to the UI widgets."""
-        method = cfg.get("method", "cross-validation")
+        method = cfg.get("method")
         (self.rb_cv if method == "cross-validation" else self.rb_holdout).setChecked(True)
 
         for learner_key, learner_info in cfg.get("learners", {}).items():
             if learner_key not in self.param_bindings:
                 continue
+
+            # Restore enabled state
+            if learner_key in self.learner_blocks:
+                enabled = learner_info.get("enabled", True)
+                self.learner_blocks[learner_key].enable_checkbox.setChecked(enabled)
 
             # Supports both the new nested shape and the older direct-param shape.
             params = learner_info.get("params", learner_info)
@@ -327,6 +359,10 @@ class MainWindow(QWidget):
                     binding.apply_mode("manual")
                 else:
                     binding.apply_mode("default")
+
+                # Restore locked state
+                locked = info.get("locked", False)
+                binding.apply_locked(locked)
 
     def set_running_state(self, running: bool, *, cancelling: bool = False) -> None:
         self.is_running = running
@@ -372,7 +408,6 @@ class MainWindow(QWidget):
         self.progress_bar.setFormat(f"{percent}%  ({current}/{total})")
 
         self.elapsed_label.setText(f"Elapsed: {format_duration(elapsed)}")
-        self.remaining_label.setText(f"Remaining: {format_duration(remaining)}")
         self.status_label.setText(message)
 
     def cleanup_thread(self) -> None:
@@ -381,7 +416,6 @@ class MainWindow(QWidget):
     def on_finished(self, success: bool, message: str) -> None:
         self.set_running_state(False)
         self.status_label.setText(message)
-        self.remaining_label.setText("Remaining: 00:00" if success else "Remaining: --:--")
 
         if success:
             QMessageBox.information(self, "Run", message)
@@ -401,12 +435,11 @@ class MainWindow(QWidget):
             QMessageBox.critical(self, "Invalid configuration", str(exc))
             return
 
-        num_learners = total_learners(cfg)
+        num_learners = self.get_enabled_learners_count(cfg)
         self.progress_bar.setRange(0, num_learners)
         self.progress_bar.setValue(0)
         self.progress_bar.setFormat(f"0%  (0/{num_learners})")
         self.elapsed_label.setText("Elapsed: 00:00")
-        self.remaining_label.setText("Remaining: estimating...")
         self.status_label.setText("Starting run...")
 
         self.set_running_state(True)

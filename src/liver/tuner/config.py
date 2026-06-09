@@ -22,7 +22,7 @@ LEARNER_SPECS: LearnerSpecs = {
         "params": {
             "C": {
                 "default": 1.0,
-                "manual_values": [0.01, 0.05, 0.1, 1.0, 5.0, 10.0],
+                "manual_values": [1.0],
                 "type": "float",
                 "orange": "Regularization strength",
                 "description": "Inverse regularization strength. Smaller values mean stronger regularization.",
@@ -314,9 +314,3 @@ LEARNER_SPECS: LearnerSpecs = {
         },
     },
 }
-
-LEARNER_PAIRS = [
-    ("LR", "DT"),
-    ("RF", "GB"),
-    ("NN", "SVM"),
-]

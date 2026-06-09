@@ -4,7 +4,7 @@ import sys
 
 from AnyQt.QtWidgets import QApplication
 
-from liver.tuner.app_window import MainWindow
+from liver.tuner.window import MainWindow
 from liver.tuner.styles import STYLESHEET
 
 
@@ -13,8 +13,7 @@ def main() -> int:
     app.setStyleSheet(STYLESHEET)
 
     window = MainWindow()
-    window.show()
-    # window.showFullScreen()
+    window.showMaximized()
 
     return app.exec()
 

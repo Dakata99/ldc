@@ -3,19 +3,63 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from AnyQt.QtCore import Qt
+from AnyQt.QtCore import QSize, Qt
+from AnyQt.QtGui import QIcon, QPainter, QPen, QPixmap
 from AnyQt.QtWidgets import (
     QButtonGroup,
+    QCheckBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QPushButton,
     QRadioButton,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
+from loguru import logger
 
-from .ui_helpers import hline, json_text, parameter_display_label, parse_manual_list, vline
+from .ui_helpers import hline, json_text, parse_manual_list, vline
+
+
+def create_lock_icon(locked: bool, size: int = 32) -> QIcon:
+    """Create a lock or unlock icon using QPainter.
+
+    Args:
+        locked: If True, draw a closed lock; if False, draw an open lock.
+        size: Icon size in pixels.
+    """
+    pixmap = QPixmap(size, size)
+    pixmap.fill(Qt.GlobalColor.transparent)
+
+    painter = QPainter(pixmap)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+    # Draw lock body (rectangle)
+    body_x = size * 0.25
+    body_y = size * 0.55
+    body_w = size * 0.5
+    body_h = size * 0.35
+    painter.setPen(QPen(Qt.GlobalColor.black, max(1, size // 16)))
+    painter.drawRect(int(body_x), int(body_y), int(body_w), int(body_h))
+
+    if locked:
+        # Draw closed shackle (arch over the lock body)
+        shackle_x = size * 0.35
+        shackle_y = size * 0.15
+        shackle_w = size * 0.3
+        shackle_h = size * 0.35
+        painter.drawArc(int(shackle_x), int(shackle_y), int(shackle_w), int(shackle_h), 0, 180 * 16)
+    else:
+        # Draw open shackle (left arc, open to the right)
+        shackle_x = size * 0.25
+        shackle_y = size * 0.15
+        shackle_w = size * 0.2
+        shackle_h = size * 0.35
+        painter.drawArc(int(shackle_x), int(shackle_y), int(shackle_w), int(shackle_h), 0, 180 * 16)
+
+    painter.end()
+    return QIcon(pixmap)
 
 
 @dataclass
@@ -27,6 +71,7 @@ class ParamBinding:
     manual_input: QLineEdit
     btn_group: QButtonGroup
     default_label: QLabel
+    lock_button: QPushButton = None
 
     @property
     def default_value(self) -> Any:
@@ -45,9 +90,18 @@ class ParamBinding:
         )
 
     def selected_values_for_sweep(self) -> list[Any]:
+        if self.is_locked():
+            # Locked parameters use their current value (fixed, not swept)
+            return [self.value()]
         if self.mode() == "manual":
             return self.value()
         return [self.default_value]
+
+    def is_locked(self) -> bool:
+        """Check if this parameter is locked from sweeping."""
+        if self.lock_button is None:
+            return False
+        return self.lock_button.isChecked()
 
     def as_config(self) -> dict[str, Any]:
         """Serializable state. The key in the parent dict remains the API name."""
@@ -57,6 +111,7 @@ class ParamBinding:
             "api_param": self.api_param_name,
             "orange": self.spec.get("orange"),
             "type": self.spec.get("type", "unknown"),
+            "locked": self.is_locked(),
         }
 
     def apply_mode(self, mode: str) -> None:
@@ -73,300 +128,366 @@ class ParamBinding:
         else:
             self.manual_input.setText(json_text([value]))
 
-
-def make_section_header() -> QWidget:
-    left_label = QLabel("Parameter")
-    left_label.setObjectName("section-label")
-    left_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    middle = QLabel("Default values")
-    middle.setObjectName("section-label")
-    middle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    right_label = QLabel("Manual values")
-    right_label.setObjectName("section-label")
-    right_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    left = QHBoxLayout()
-    left.setContentsMargins(8, 0, 8, 0)
-    left.addWidget(left_label)
-
-    mid = QHBoxLayout()
-    mid.setContentsMargins(8, 0, 8, 0)
-    mid.addWidget(middle)
-
-    right = QHBoxLayout()
-    right.setContentsMargins(8, 0, 8, 0)
-    right.addWidget(right_label)
-
-    left_widget = QWidget()
-    left_widget.setLayout(left)
-    right_widget = QWidget()
-    right_widget.setLayout(right)
-    middle_widget = QWidget()
-    middle_widget.setLayout(mid)
-
-    row = QHBoxLayout()
-    row.setContentsMargins(0, 0, 0, 0)
-    row.setSpacing(0)
-    row.addWidget(left_widget, 3)
-    row.addWidget(vline())
-    row.addWidget(middle_widget, 1)
-    row.addWidget(vline())
-    row.addWidget(right_widget, 2)
-
-    widget = QWidget()
-    widget.setObjectName("section-header")
-    widget.setLayout(row)
-    return widget
+    def apply_locked(self, locked: bool) -> None:
+        """Restore locked state when loading a config."""
+        if self.lock_button is not None:
+            self.lock_button.setChecked(locked)
+            self.lock_button.setIcon(create_lock_icon(locked=locked))
 
 
-def make_param_label_block(api_param_name: str, spec: dict[str, Any]) -> QWidget:
-    display_label = parameter_display_label(api_param_name, spec)
-    exposed = bool(spec.get("orange", False))
+class Header(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-    param_lbl = QLabel(f"{display_label} ({api_param_name}):" if exposed else api_param_name)
-    param_lbl.setObjectName("param-name")
-    param_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-    param_lbl.setToolTip(spec.get("description", ""))
+        self.setObjectName("section-header")
 
-    # If in Python API only, add a badge to indicate that.
-    if not exposed:
-        badge = QLabel("PYTHON")
-        badge.setObjectName("badge-python")
-        badge.setToolTip("Python API only / not directly exposed in Orange GUI")
+        # Column 1 - parameter labels
+        param = QLabel("Parameter")
+        param.setObjectName("section-label")
+        param.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    second_line = QHBoxLayout()
-    second_line.setContentsMargins(0, 0, 0, 0)
-    second_line.setSpacing(1)
-    if not exposed:
-        second_line.addWidget(badge)
-    second_line.addWidget(param_lbl)
-    second_line.addStretch()
+        col1 = QHBoxLayout()
+        col1.setContentsMargins(8, 0, 8, 0)
+        col1.addWidget(param)
 
-    layout = QVBoxLayout()
-    layout.setContentsMargins(0, 0, 0, 0)
-    layout.setSpacing(1)
-    layout.addLayout(second_line)
+        # Column 2 - fields
+        field = QLabel("Field")
+        field.setObjectName("section-label")
+        field.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    block = QWidget()
-    block.setObjectName("param-label-block")
-    block.setLayout(layout)
-    block.setFixedWidth(360)
-    return block
+        col2 = QHBoxLayout()
+        col2.setContentsMargins(8, 0, 8, 0)
+        col2.addWidget(field)
 
+        # Column 3 - default values
+        defaults = QLabel("Default values")
+        defaults.setObjectName("section-label")
+        defaults.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-def make_param_row(
-    learner_key: str,
-    learner_display_name: str,
-    api_param_name: str,
-    spec: dict[str, Any],
-    param_bindings: dict[str, dict[str, ParamBinding]],
-) -> QWidget:
-    default_value = spec["default"]
-    manual_values = spec["manual_values"]
+        col3 = QHBoxLayout()
+        col3.setContentsMargins(8, 0, 8, 0)
+        col3.addWidget(defaults)
 
-    btn_group = QButtonGroup()
-    rb_default = QRadioButton("")
-    rb_default.setToolTip("Use the typed default value")
-    rb_manual = QRadioButton("")
-    rb_manual.setToolTip("Use the JSON list from the manual side")
-    btn_group.addButton(rb_default, 0)
-    btn_group.addButton(rb_manual, 1)
+        # Column 4 - manual values
+        manuals = QLabel("Manual values")
+        manuals.setObjectName("section-label")
+        manuals.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    default_label = QLabel(json_text(default_value))
-    default_label.setObjectName("default-value")
-    default_label.setToolTip(f"Python value type: {type(default_value).__name__}")
-
-    manual_input = QLineEdit()
-    manual_input.setText(json_text(manual_values))
-    manual_input.setPlaceholderText("JSON list, e.g. [0.1, 1.0, 10.0]")
-    manual_input.setToolTip(
-        "Manual mode always expects a JSON list. "
-        "For list-valued parameters, use a list of lists, e.g. [[100], [50, 50]]."
-    )
-    manual_input.setEnabled(False)
-
-    label_block = make_param_label_block(api_param_name, spec)
-
-    def on_mode_changed(button_id: int) -> None:
-        is_default = button_id == 0
-        default_label.setEnabled(is_default)
-        manual_input.setEnabled(not is_default)
-
-    btn_group.idClicked.connect(on_mode_changed)
-    rb_default.setChecked(True)
-
-    # Left boxt (parameters labels and badges)
-    left = QHBoxLayout()
-    left.setContentsMargins(8, 5, 8, 5)
-    left.setSpacing(10)
-    left.addWidget(label_block)
-    left.addStretch()
-
-    left_widget = QWidget()
-    left_widget.setLayout(left)
-    left_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-
-    # Middle box (default values)
-    middle = QHBoxLayout()
-    middle.setContentsMargins(8, 5, 8, 5)
-    middle.setSpacing(10)
-    middle.addWidget(rb_default)
-    middle.addWidget(default_label)
-    middle.addStretch()
-
-    middle_widget = QWidget()
-    middle_widget.setLayout(middle)
-    middle_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-
-    # Right box (manual values)
-    right = QHBoxLayout()
-    right.setContentsMargins(8, 5, 8, 5)
-    right.setSpacing(10)
-    right.addWidget(rb_manual)
-    right.addWidget(manual_input)
-    right.addStretch()
-
-    right_widget = QWidget()
-    right_widget.setLayout(right)
-    right_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-
-    # Main box
-    row = QHBoxLayout()
-    row.setContentsMargins(0, 0, 0, 0)
-    row.setSpacing(0)
-    row.addWidget(left_widget, 3)
-    row.addWidget(vline())
-    row.addWidget(middle_widget, 1)
-    row.addWidget(vline())
-    row.addWidget(right_widget, 2)
-
-    row_widget = QWidget()
-    row_widget.setObjectName("param-row")
-    row_widget.setLayout(row)
-
-    # Keep the button group alive. No worker thread owns this object.
-    btn_group.setParent(row_widget)
-
-    param_bindings.setdefault(learner_key, {})[api_param_name] = ParamBinding(
-        learner_key=learner_key,
-        learner_display_name=learner_display_name,
-        api_param_name=api_param_name,
-        spec=spec,
-        manual_input=manual_input,
-        btn_group=btn_group,
-        default_label=default_label,
-    )
-
-    return row_widget
-
-
-def make_learner_block(
-    learner_key: str,
-    learner_spec: dict[str, Any],
-    param_bindings: dict[str, dict[str, ParamBinding]],
-) -> QWidget:
-    display_name = learner_spec.get("display_name", learner_key)
-    api_class = learner_spec.get("api_class", "")
-
-    outer = QVBoxLayout()
-    outer.setContentsMargins(14, 12, 14, 14)
-    outer.setSpacing(0)
-
-    title = QLabel(f"{display_name}")
-    title.setObjectName("learner-title")
-    title.setToolTip(f"Python API class: {api_class}")
-    outer.addWidget(title)
-    outer.addWidget(hline())
-    outer.addSpacing(4)
-
-    outer.addWidget(make_section_header())
-    outer.addWidget(hline())
-
-    params = learner_spec.get("params", {})
-    for i, (api_param_name, param_spec) in enumerate(params.items()):
-        outer.addWidget(
-            make_param_row(
-                learner_key=learner_key,
-                learner_display_name=display_name,
-                api_param_name=api_param_name,
-                spec=param_spec,
-                param_bindings=param_bindings,
-            )
-        )
-        if i < len(params) - 1:
-            outer.addWidget(hline())
-
-    combinations_label = QLabel("Number of combination: ")
-    combinations_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-    outer.addWidget(combinations_label)
-
-    block_widget = QWidget()
-    block_widget.setObjectName("learner-block")
-    block_widget.setLayout(outer)
-    block_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-    return block_widget
-
-
-class LearnerBlock:
-    def __init__(self):
-        self._header = None
-        self._param_label_block = None
-        self._param_rows = None
-
-    def _build_header(self):
-        # Left box - parameter labels
-        left_label = QLabel("Parameter")
-        left_label.setObjectName("section-label")
-        left_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        left = QHBoxLayout()
-        left.setContentsMargins(8, 0, 8, 0)
-        left.addWidget(left_label)
-
-        # Middle box - default values
-        middle_label = QLabel("Default values")
-        middle_label.setObjectName("section-label")
-        middle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        middle = QHBoxLayout()
-        middle.setContentsMargins(8, 0, 8, 0)
-        middle.addWidget(middle_label)
-
-        # Right box - manual values
-        right_label = QLabel("Manual values")
-        right_label.setObjectName("section-label")
-        right_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        right = QHBoxLayout()
-        right.setContentsMargins(8, 0, 8, 0)
-        right.addWidget(right_label)
+        col4 = QHBoxLayout()
+        col4.setContentsMargins(8, 0, 8, 0)
+        col4.addWidget(manuals)
 
         # Whole box
-        left_widget = QWidget()
-        left_widget.setLayout(left)
-        right_widget = QWidget()
-        right_widget.setLayout(right)
-        middle_widget = QWidget()
-        middle_widget.setLayout(middle)
+        first = QWidget()
+        first.setLayout(col1)
+
+        second = QWidget()
+        second.setLayout(col2)
+
+        third = QWidget()
+        third.setLayout(col3)
+
+        fourth = QWidget()
+        fourth.setLayout(col4)
 
         # Whole box
-        row = QHBoxLayout()
+        row = QHBoxLayout(self)
         row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(0)
-        row.addWidget(left_widget, 3)
+
+        row.addWidget(first, 2)
         row.addWidget(vline())
-        row.addWidget(middle_widget, 1)
+        row.addWidget(second, 1)
         row.addWidget(vline())
-        row.addWidget(right_widget, 2)
+        row.addWidget(third, 1)
+        row.addWidget(vline())
+        row.addWidget(fourth, 2)
 
-        self._header = QWidget()
-        self._header.setObjectName("section-header")
-        self._header.setLayout(row)
 
-    def _build_param_label_block(self):
-        pass
+class ParamBlock(QWidget):
+    def __init__(
+        self,
+        api_param_name: str,
+        spec: dict[str, Any],
+        *,
+        field: bool = False,
+        parent=None,
+    ):
+        super().__init__(parent)
 
-    def _build_param_rows(self):
-        pass
+        display_label = spec.get("orange", "-")
+
+        label_text = api_param_name if field else display_label
+        label = QLabel(label_text)
+        label.setObjectName("param-name")
+        label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        label.setToolTip(spec.get("description", ""))
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(4)
+        layout.addWidget(label)
+        layout.addStretch()
+
+        self.setObjectName("param-label-block")
+        self.setLayout(layout)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+
+class ParamRow(QWidget):
+    def __init__(
+        self,
+        learner_key: str,
+        learner_display_name: str,
+        api_param_name: str,
+        spec: dict[str, Any],
+        param_bindings: dict[str, dict[str, ParamBinding]],
+        on_mode_changed_callback=None,
+        parent=None,
+    ):
+        super().__init__(parent)
+
+        default_value = spec["default"]
+        manual_values = spec["manual_values"]
+
+        btn_group = QButtonGroup()
+        rb_default = QRadioButton("")
+        rb_default.setToolTip("Use the typed default value")
+        rb_manual = QRadioButton("")
+        rb_manual.setToolTip("Use the JSON list from the manual side")
+        btn_group.addButton(rb_default, 0)
+        btn_group.addButton(rb_manual, 1)
+
+        default_label = QLabel(json_text(default_value))
+        default_label.setObjectName("default-value")
+        default_label.setToolTip(f"Python value type: {type(default_value).__name__}")
+
+        manual_input = QLineEdit()
+        manual_input.setText(json_text(manual_values))
+        manual_input.setPlaceholderText("JSON list, e.g. [0.1, 1.0, 10.0]")
+        manual_input.setToolTip(
+            "Manual mode always expects a JSON list. "
+            "For list-valued parameters, use a list of lists, e.g. [[100], [50, 50]]."
+        )
+        manual_input.setEnabled(False)
+
+        param_block = ParamBlock(api_param_name, spec, field=False)
+        field_block = ParamBlock(api_param_name, spec, field=True)
+
+        def on_mode_changed(button_id: int) -> None:
+            is_default = button_id == 0
+            default_label.setEnabled(is_default)
+            manual_input.setEnabled(not is_default)
+            if on_mode_changed_callback:
+                on_mode_changed_callback()
+
+        btn_group.idClicked.connect(on_mode_changed)
+        rb_default.setChecked(True)
+
+        # Connect manual input changes to recalculate combinations
+        if on_mode_changed_callback:
+            manual_input.textChanged.connect(on_mode_changed_callback)
+
+        # Create lock button with real icon
+        lock_button = QPushButton()
+        lock_button.setIcon(create_lock_icon(locked=False))
+        lock_button.setToolTip("Lock/unlock this parameter from sweeping")
+        lock_button.setMaximumWidth(45)
+        lock_button.setMaximumHeight(32)
+        lock_button.setCheckable(True)
+        lock_button.setIconSize(QSize(32, 32))
+
+        def on_lock_toggled(checked: bool) -> None:
+            lock_button.setIcon(create_lock_icon(locked=checked))
+            # Disable mode/value editing when locked
+            rb_default.setEnabled(not checked)
+            rb_manual.setEnabled(not checked)
+            if not checked:
+                # When unlocking, restore proper state based on current mode
+                is_manual = btn_group.checkedId() == 1
+                manual_input.setEnabled(is_manual)
+                default_label.setEnabled(not is_manual)
+            else:
+                # When locking, disable both
+                manual_input.setEnabled(False)
+                default_label.setEnabled(False)
+            if on_mode_changed_callback:
+                on_mode_changed_callback()
+
+        lock_button.clicked.connect(on_lock_toggled)
+
+        # Column 1 - parameter
+        param = QHBoxLayout()
+        param.setContentsMargins(8, 5, 8, 5)
+        param.setSpacing(10)
+        param.addWidget(lock_button)
+        param.addWidget(param_block)
+        param.addStretch()
+
+        col1 = QWidget()
+        col1.setLayout(param)
+        col1.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        # Column 2 - fields
+        field = QHBoxLayout()
+        field.setContentsMargins(8, 5, 8, 5)
+        field.setSpacing(10)
+        field.addWidget(field_block)
+        field.addStretch()
+
+        col2 = QWidget()
+        col2.setLayout(field)
+        col2.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        # Column 3 - default values
+        defaults = QHBoxLayout()
+        defaults.setContentsMargins(8, 5, 8, 5)
+        defaults.setSpacing(10)
+        defaults.addWidget(rb_default)
+        defaults.addWidget(default_label)
+        defaults.addStretch()
+
+        col3 = QWidget()
+        col3.setLayout(defaults)
+        col3.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        # Column 4 - manual values
+        manuals = QHBoxLayout()
+        manuals.setContentsMargins(8, 5, 8, 5)
+        manuals.setSpacing(10)
+        manuals.addWidget(rb_manual)
+        manuals.addWidget(manual_input)
+        manuals.addStretch()
+
+        col4 = QWidget()
+        col4.setLayout(manuals)
+        col4.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        # Main box
+        row = QHBoxLayout(self)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(0)
+        row.addWidget(col1, 2)
+        row.addWidget(vline())
+        row.addWidget(col2, 1)
+        row.addWidget(vline())
+        row.addWidget(col3, 1)
+        row.addWidget(vline())
+        row.addWidget(col4, 2)
+
+        self.setObjectName("param-row")
+        self.setLayout(row)
+
+        # Keep the button group alive. No worker thread owns this object.
+        btn_group.setParent(self)
+
+        param_bindings.setdefault(learner_key, {})[api_param_name] = ParamBinding(
+            learner_key=learner_key,
+            learner_display_name=learner_display_name,
+            api_param_name=api_param_name,
+            spec=spec,
+            manual_input=manual_input,
+            btn_group=btn_group,
+            default_label=default_label,
+            lock_button=lock_button,
+        )
+
+
+class LearnerBlock(QWidget):
+    def __init__(
+        self,
+        learner_key: str,
+        learner_spec: dict[str, Any],
+        param_bindings: dict[str, dict[str, ParamBinding]],
+        on_combinations_changed=None,
+        parent=None,
+    ):
+        super().__init__(parent)
+        display_name = learner_spec.get("display_name", learner_key)
+        api_class = learner_spec.get("api_class", "")
+
+        outer = QVBoxLayout()
+        outer.setContentsMargins(14, 12, 14, 14)
+        outer.setSpacing(0)
+
+        # Title with enable checkbox
+        title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setSpacing(8)
+
+        title_layout.addStretch()
+
+        enable_checkbox = QCheckBox()
+        enable_checkbox.setChecked(True)
+        enable_checkbox.setToolTip("Enable/disable this learner")
+        enable_checkbox.setObjectName("check-box")
+        title_layout.addWidget(enable_checkbox)
+
+        title = QLabel(f"{display_name}")
+        title.setObjectName("learner-title")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+        title.setToolTip(f"Python API class: {api_class}")
+        title_layout.addWidget(title)
+        title_layout.addStretch()
+
+        title_widget = QWidget()
+        title_widget.setLayout(title_layout)
+        outer.addWidget(title_widget)
+        outer.addWidget(hline())
+        outer.addSpacing(4)
+
+        header = Header()
+        outer.addWidget(header)
+        outer.addWidget(hline())
+
+        # Create combinations label early so we can update it
+        combinations_label = QLabel("Number of combinations: ")
+        combinations_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+        def update_combinations() -> None:
+            """Recalculate and update the combinations count."""
+            try:
+                combinations: dict[str, int] = {learner_key: 1}
+                for _, param_binding in param_bindings[learner_key].items():
+                    combinations[learner_key] *= len(param_binding.selected_values_for_sweep())
+                combinations_label.setText(f"# Combinations: {combinations[learner_key]}")
+                logger.debug(f"Updated combinations: {combinations[learner_key]}")
+                if on_combinations_changed:
+                    on_combinations_changed()
+            except ValueError as e:
+                # Invalid JSON in manual input - show error state
+                combinations_label.setText("# Combinations: invalid input")
+                logger.warning(f"Invalid manual input: {e}")
+                if on_combinations_changed:
+                    on_combinations_changed()
+
+        params = learner_spec.get("params", {})
+        for i, (api_param_name, param_spec) in enumerate(params.items()):
+            outer.addWidget(
+                ParamRow(
+                    learner_key=learner_key,
+                    learner_display_name=display_name,
+                    api_param_name=api_param_name,
+                    spec=param_spec,
+                    param_bindings=param_bindings,
+                    on_mode_changed_callback=update_combinations,
+                )
+            )
+            if i < len(params) - 1:
+                outer.addWidget(hline())
+
+        # Initial calculation
+        update_combinations()
+        outer.addWidget(combinations_label)
+
+        self.setObjectName("learner-block")
+        self.setLayout(outer)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        # Store checkbox for later access
+        self.enable_checkbox = enable_checkbox
+        self.learner_key = learner_key
+
+    def is_enabled(self) -> bool:
+        """Check if this learner is enabled."""
+        return self.enable_checkbox.isChecked()
