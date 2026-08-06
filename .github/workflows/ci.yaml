@@ -1,0 +1,50 @@
+name: Run experiments
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  experiments:
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v4
+
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
+
+        - name: Run experiment 1
+          run: |
+            source setup
+            liver --experiment 1 --hold-out --config default
+
+        - name: Run experiment 2
+          run: |
+            source setup
+            liver --experiment 2 --hold-out --config default
+
+        - name: Run experiment 3
+          run: |
+            source setup
+            liver --experiment 3 --hold-out --config default
+
+        - name: Copy generated reports
+          run: |
+            mkdir -p public/reports
+            cp -r reports/* public/reports/
+
+        - name: Upload Pages artifact
+          uses: actions/upload-pages-artifact@v1
+          with:
+            path: public
+
+        - name: Deploy to GitHub Pages
+          uses: actions/deploy-pages@v1
