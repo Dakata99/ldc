@@ -16,17 +16,31 @@ jobs:
         - name: Install uv
           uses: astral-sh/setup-uv@v5
 
+        - name: Sync dependencies
+          run: |
+            uv sync
+
         - name: Run experiment 1
           run: |
-            source setup
-            liver --experiment 1 --hold-out --config default
+            uv run liver --experiment 1 --hold-out --config default
 
         - name: Run experiment 2
           run: |
-            source setup
-            liver --experiment 2 --hold-out --config default
+            uv run liver --experiment 2 --hold-out --config default
 
         - name: Run experiment 3
           run: |
-            source setup
-            liver --experiment 3 --hold-out --config default
+            uv run liver --experiment 3 --hold-out --config default
+
+        - name: Copy generated reports
+          run: |
+            mkdir -p public/reports
+            cp -r reports/* public/reports/
+
+        - name: Upload Pages artifact
+          uses: actions/upload-pages-artifact@v1
+          with:
+            path: public
+
+        - name: Deploy to GitHub Pages
+          uses: actions/deploy-pages@v1
