@@ -31,15 +31,15 @@ jobs:
 
         - name: Run experiment 1
           run: |
-            uv run liver --experiment 1 --hold-out --config default
+            uv run liver --experiment 1 --hold-out --config default --debug
 
         - name: Run experiment 2
           run: |
-            uv run liver --experiment 2 --hold-out --config default
+            uv run liver --experiment 2 --hold-out --config default --debug
 
         - name: Run experiment 3
           run: |
-            uv run liver --experiment 3 --hold-out --config default
+            uv run liver --experiment 3 --hold-out --config default --debug
 
         - name: Copy generated reports
           run: |
@@ -48,6 +48,12 @@ jobs:
 
         - name: Configure GitHub Pages
           uses: actions/configure-pages@v5
+
+        - name: Upload reports as artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: experiment-reports
+            path: reports/
 
         - name: Upload Pages artifact
           uses: actions/upload-pages-artifact@v3
