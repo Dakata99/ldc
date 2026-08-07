@@ -1,105 +1,81 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import functools
-import time
 from itertools import product
 from pathlib import Path
-from typing import Any
+import time
+from typing import Any, ParamSpec, TypeVar
 
 from loguru import logger
 from Orange.classification import (
-    GBClassifier,
-    LogisticRegressionLearner,
-    NNClassificationLearner,
-    RandomForestLearner,
-    SVMLearner,
-    TreeLearner,
+	GBClassifier,
+	LogisticRegressionLearner,
+	NNClassificationLearner,
+	RandomForestLearner,
+	SVMLearner,
+	TreeLearner,
 )
 
+LEARNERS_MAPPING: dict[str | Any, Any] = {
+	"logistic-regression": LogisticRegressionLearner,
+	"random-forest": RandomForestLearner,
+	"tree": TreeLearner,
+	"gradient-boosting": GBClassifier,
+	"neural-network": NNClassificationLearner,
+	"svm": SVMLearner,
+}
 
-def root(*args) -> Path:
-    """Get root folder of the project.
-    TODO: maybe find a better way?
-
-    Args:
-        *args: path components to join with the project root.
-
-    Returns:
-        Path: the path to the project root joined with the provided path components.
-    """
-    return Path(__file__).resolve().parents[2].joinpath(*args)
-
-
-def create_learners(config):
-    """Create all combinations of learners by the specified configuration."""
-
-    # Helper function to get all combinations of hyperparameters
-    def get_combinations(params) -> list[dict[Any, Any]]:
-        return [dict(zip(params.keys(), combo, strict=True)) for combo in product(*params.values())]
-
-    # 1) Logistic regression
-    configuration = config["logistic-regression"]
-    combos = get_combinations(configuration)
-    logger.debug(f"LR combinations ({len(combos)}): {combos}")
-    logistic_regressions = [LogisticRegressionLearner(**combo) for combo in combos]
-    logger.debug(logistic_regressions)
-
-    # 2) Random forest
-    configuration = config["random-forest"]
-    combos = get_combinations(configuration)
-    logger.debug(f"RF combinations ({len(combos)}): {combos}")
-    random_forests = [RandomForestLearner(**combo) for combo in combos]
-    logger.debug(random_forests)
-
-    # 3) Tree
-    configuration = config["tree"]
-    combos = get_combinations(configuration)
-    logger.debug(f"Tree combinations ({len(combos)}): {combos}")
-    trees = [TreeLearner(**combo) for combo in combos]
-    logger.debug(trees)
-
-    # 4) Gradient boosting
-    configuration = config["gradient-boosting"]
-    combos = get_combinations(configuration)
-    logger.debug(f"GB combinations ({len(combos)}): {combos}")
-    gradient_boostings = [GBClassifier(**combo) for combo in combos]
-    logger.debug(gradient_boostings)
-
-    # 5) Neural network
-    configuration = config["neural-network"]
-    combos = get_combinations(configuration)
-    logger.debug(f"NN combinations ({len(combos)}): {combos}")
-    neural_networks = [NNClassificationLearner(**combo) for combo in combos]
-    logger.debug(neural_networks)
-
-    # 6) SVM
-    configuration = config["svm"]
-    combos = []
-    for subconfig in configuration:
-        combos.extend(get_combinations(subconfig))
-    logger.debug(f"SVM combinations ({len(combos)}): {combos}")
-    svms = [SVMLearner(**combo) for combo in combos]
-    logger.debug(svms)
-
-    return {
-        "logistic-regression": logistic_regressions,
-        "random-forest": random_forests,
-        "tree": trees,
-        "gradient-boosting": gradient_boostings,
-        "neural-network": neural_networks,
-        "svm": svms,
-    }
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
-def profiler(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        start_time = time.perf_counter()
-        result = func(*args, **kwargs)
-        end_time = time.perf_counter() - start_time
-        logger.info(
-            f"Function '{func.__name__}' executed in {end_time / 60:.2f} mins ({end_time:.4f} seconds)"
-        )
-        return result
+def root(*args: Path | str) -> Path:
+	"""Get root folder of the project.
+	TODO: maybe find a better way?
 
-    return wrapper
+	Args:
+		*args: path components to join with the project root.
+
+	Returns:
+		Path: the path to the project root joined with the provided path components.
+	"""
+	return Path(__file__).resolve().parents[2].joinpath(*args)
+
+
+def create_learners(config: dict[str, Any]) -> dict[str, list[Any]]:
+	"""Create all combinations of learners by the specified configuration."""
+
+	# Helper function to get all combinations of hyperparameters
+	def get_combinations(params: dict[Any, Any]) -> list[dict[Any, Any]]:
+		return [dict(zip(params.keys(), combo, strict=True)) for combo in product(*params.values())]
+
+	learners: dict[str, list[Any]] = {}
+	for key, value in config.items():
+		combos = []
+		if isinstance(value, list):  # SVM-specific
+			for subconfig in value:
+				combos.extend(get_combinations(subconfig))
+		else:
+			combos = get_combinations(value)
+		logger.debug(f"Combinations for {key} ({len(combos)}): {combos}")
+		learners[key] = [LEARNERS_MAPPING[key](**combo) for combo in combos]
+		logger.debug(learners[key])
+
+	logger.debug(learners)
+
+	return learners
+
+
+def profiler(func: Callable[P, R]) -> Callable[P, R]:
+	@functools.wraps(func)
+	def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+		start_time = time.perf_counter()
+		result = func(*args, **kwargs)
+		end_time = time.perf_counter() - start_time
+		logger.info(
+			f"Function '{func.__name__}' executed in {end_time / 60:.2f} mins ({end_time:.4f} seconds)"
+		)
+		return result
+
+	return wrapper
