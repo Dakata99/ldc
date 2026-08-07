@@ -12,6 +12,9 @@ AVAILABLE_CONFIGS = (
 	"expr3-default",  # Tied for experiment 3
 )
 
+CROSS_VALIDATION: str = "cross-validation"
+HOLD_OUT: str = "hold-out"
+
 
 def setup_logging(debug: bool = False) -> None:
 	import sys
@@ -83,7 +86,7 @@ def main() -> None:
 	setup_logging(args.debug)
 
 	# Method for evaluation, hold-out = test on test data
-	method = "cv" if args.cross_validation else "totd"
+	method = CROSS_VALIDATION if args.cross_validation else HOLD_OUT
 
 	if args.experiment and not args.plot_only and not args.iplot:
 		# Run the analysis for the specified experiment

@@ -23,6 +23,9 @@ EXPERIMENTS: dict[int, str] = {
 	3: "Binary classification for all 3 datasets",
 }
 
+CROSS_VALIDATION: str = "cross-validation"
+HOLD_OUT: str = "hold-out"
+
 
 class TestAndScore:
 	def __init__(self, learners: list[Any]):
@@ -43,21 +46,23 @@ class TestAndScore:
 	def train(self, train: Table, test: Table, method: str) -> None:
 		"""Method for training learnears."""
 		# Evaluate models with the chosen method
-		if method == "cv":
-			logger.info(f"CrossValidation: evaluating {len(self._learners)} learners...")
+		if method == CROSS_VALIDATION:
+			logger.info(
+				f"{CROSS_VALIDATION.capitalize()}: evaluating {len(self._learners)} learners..."
+			)
 
 			def progress_callback(progress: float) -> None:
 				logger.info("Progress: {}%", round(progress * 100, 1))
 
-			cv = CrossValidation()
-			self._scores = cv(
+			evaluator = CrossValidation()
+			self._scores = evaluator(
 				train,
 				self._learners,
 				preprocessor=self._preprocessor,
 				callback=progress_callback,
 			)
 		else:
-			logger.info(f"TestOnTestData: evaluating {len(self._learners)} learners...")
+			logger.info(f"{HOLD_OUT.capitalize()}: evaluating {len(self._learners)} learners...")
 
 			# Evaluate using TestOnTestData (train on train set, test on test set)
 			def progress_callback(progress: float) -> None:

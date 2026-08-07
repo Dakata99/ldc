@@ -9,8 +9,9 @@ The experimental study consists of 3 experimental scenarios:
 
 ## Prerequisites
 
+Install `uv` tool:
 ```bash
-sudo snap install astral-uv --classic
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ## Datasets

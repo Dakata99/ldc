@@ -3,6 +3,12 @@
 # Liver disease exploratory data analysis.
 #
 
+if [[ $(which uv) == "" ]]; then
+    echo "Please install uv and try again."
+    echo "Command: curl -LsSf https://astral.sh/uv/install.sh | sh"
+    exit 1
+fi
+
 PROMPT=ldc
 VENV=.$PROMPT
 
