@@ -31,9 +31,9 @@ source setupenv
 Then the `liver` command will be present and you can run `liver -h` to see what it does:
 ```bash
 $ liver -h
-usage: liver [-h] --experiment {1,2,3} [--debug]
+usage: liver [-h] [--experiment {1,2,3}] [--debug]
              [--learners-group {logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} [{logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} ...]]
-             [--config {default,global,experiment1,experiment2,experiment3}] [--plot-only]
+             [--config {default,default-full,global,experiment1,experiment2,experiment3,expr3-default}] [--plot-only | --iplot] [--cross-validation | --hold-out]
 
 options:
   -h, --help            show this help message and exit
@@ -41,9 +41,12 @@ options:
   --debug               Enable debug logging
   --learners-group {logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} [{logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} ...]
                         Run specific family(ies) of learners.
-  --config {default,global,experiment1,experiment2,experiment3}
+  --config {default,default-full,global,experiment1,experiment2,experiment3,expr3-default}
                         Configuration to use for the experiment
   --plot-only           Plot only on already existing results.
+  --iplot               Plot only on already existing results (interactivity).
+  --cross-validation    Use Cross Validation method.
+  --hold-out            Use Hold-out (TestOnTestData) method.
 ```
 
 To check the generated results/report, run:
