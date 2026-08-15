@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from loguru import logger
+import mlflow
 from Orange.data import Table
 from Orange.evaluation import AUC, CA, F1, MatthewsCorrCoefficient, Precision, Recall
 from Orange.evaluation.testing import CrossValidation, TestOnTestData
@@ -43,7 +44,14 @@ class TestAndScore:
 
 	@profiler  # type: ignore[untyped-decorator]
 	def train(self, train: Table, test: Table, method: str) -> None:
-		"""Method for training learnears."""
+		"""Method for training learnears.
+
+		Args:
+			train (Table): Train data.
+			test (Table): Test data.
+			method (str): Evaluation method.
+		"""
+
 		# Evaluate models with the chosen method
 		if method == CROSS_VALIDATION:
 			logger.info(
@@ -95,44 +103,51 @@ class TestAndScore:
 		# Will be ordered in the CSV file as here and plotting will keep this priority!
 		metrics: dict[int, dict[str, Any]] = {
 			1: {
-				"Recall(weighted)": partial(Recall, target=None, average="weighted"),
-				"F1(weighted)": partial(F1, target=None, average="weighted"),
-				"MCC": MatthewsCorrCoefficient,
-				"Precision(weighted)": partial(Precision, target=None, average="weighted"),
-				"AUC": AUC,
-				"CA": CA,
+				"recall_weighted": partial(Recall, target=None, average="weighted"),
+				"f1_weighted": partial(F1, target=None, average="weighted"),
+				"mcc": MatthewsCorrCoefficient,
+				"precision_weighted": partial(Precision, target=None, average="weighted"),
+				"auc": AUC,
+				"ca": CA,
 			},
 			2: {
-				"Recall(Sick)": partial(Recall, target=sick_index),
-				"Recall(weighted)": partial(Recall, average="weighted"),
-				"F1(Sick)": partial(F1, target=sick_index),
-				"F1(weighted)": partial(F1, average="weighted"),
-				"MCC": MatthewsCorrCoefficient,
-				"Precision(Sick)": partial(Precision, target=sick_index),
-				"AUC": AUC,
-				"CA": CA,
+				"recall_sick": partial(Recall, target=sick_index),
+				"recall_weighted": partial(Recall, average="weighted"),
+				"f1_sick": partial(F1, target=sick_index),
+				"f1_weighted": partial(F1, average="weighted"),
+				"mcc": MatthewsCorrCoefficient,
+				"precision_sick": partial(Precision, target=sick_index),
+				"auc": AUC,
+				"ca": CA,
 			},
 			3: {
-				"Recall(Sick)": partial(Recall, target=sick_index),
-				"Recall(weighted)": partial(Recall, average="weighted"),
-				"F1(Sick)": partial(F1, target=sick_index),
-				"F1(weighted)": partial(F1, average="weighted"),
-				"MCC": MatthewsCorrCoefficient,
-				"Precision(Sick)": partial(Precision, target=sick_index),
-				"AUC": AUC,
-				"CA": CA,
+				"recall_sick": partial(Recall, target=sick_index),
+				"recall_weighted": partial(Recall, average="weighted"),
+				"f1_sick": partial(F1, target=sick_index),
+				"f1_weighted": partial(F1, average="weighted"),
+				"mcc": MatthewsCorrCoefficient,
+				"precision_sick": partial(Precision, target=sick_index),
+				"auc": AUC,
+				"ca": CA,
 			},
 		}
 
 		# Write results into a CSV file
 		rows = []
 		# Loop through learners
-		for i, learner in enumerate(self._learners):
-			row = {"Learner": repr(learner)}
-			for name, metric in metrics[exprid].items():
-				values = metric(self._scores)
-				row[name] = values[i]
-			rows.append(row)
+		with mlflow.start_run(run_name=output_filename.removesuffix(".csv")):
+			for i, learner in enumerate(self._learners):
+				row = {"Learner": repr(learner)}
+
+				with mlflow.start_run(run_name=repr(learner), nested=True):
+					mlflow.set_tag("learner_type", type(learner).__name__)
+					mlflow.log_param("learner", repr(learner))
+
+					for name, metric in metrics[exprid].items():
+						values = metric(self._scores)
+						row[name] = values[i]
+						mlflow.log_metric(key=name, value=float(values[i]))
+						rows.append(row)
 
 		df = pd.DataFrame(rows)
 		logger.success(df.to_string(index=False))
@@ -141,6 +156,8 @@ class TestAndScore:
 		if not results_dir.exists():
 			results_dir.mkdir(parents=True)
 		df.to_csv(results_dir / output_filename, index=False)
+		mlflow.log_artifact(results_dir / output_filename)
+		mlflow.log_table(df, f'experiment{exprid}-{output_filename.removesuffix(".csv")}.json')
 
 
 def main(
@@ -165,6 +182,14 @@ def main(
 		for group in learners_group:
 			if group in learners:
 				learners_to_evaluate.extend(learners[group])
+
+	# MLFlow experiment settings
+	mlflow.set_experiment(f'expriment{exprid}')
+	mlflow.set_experiment_tags({
+		'experiment': exprid,
+		'config': configuration,
+		'method': method
+	})
 
 	ts = TestAndScore(learners_to_evaluate)
 	ts.train(train, test, method)

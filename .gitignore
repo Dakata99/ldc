@@ -4,3 +4,5 @@ src/liver/__pycache__
 src/ldc.egg-info/
 .ruff_cache
 .mkdocs.base.yml
+mlflow.db
+mlruns/
