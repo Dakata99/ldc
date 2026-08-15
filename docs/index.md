@@ -33,7 +33,8 @@ Then the `liver` command will be present and you can run `liver -h` to see what 
 $ liver -h
 usage: liver [-h] [--experiment {1,2,3}] [--debug]
              [--learners-group {logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} [{logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} ...]]
-             [--config {default,default-full,global,experiment1,experiment2,experiment3,expr3-default}] [--plot-only | --iplot] [--cross-validation | --hold-out]
+             [--config {default,default-full,global,experiment1,experiment2,experiment3,experiment3-default}] [--plot-only [RESULTS_DIR]]
+             [--cross-validation | --hold-out]
 
 options:
   -h, --help            show this help message and exit
@@ -41,10 +42,10 @@ options:
   --debug               Enable debug logging
   --learners-group {logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} [{logistic-regression,random-forest,tree,gradient-boosting,neural-network,svm} ...]
                         Run specific family(ies) of learners.
-  --config {default,default-full,global,experiment1,experiment2,experiment3,expr3-default}
+  --config {default,default-full,global,experiment1,experiment2,experiment3,experiment3-default}
                         Configuration to use for the experiment
-  --plot-only           Plot only on already existing results.
-  --iplot               Plot only on already existing results (interactivity).
+  --plot-only [RESULTS_DIR]
+                        Plot only on already existing results.
   --cross-validation    Use Cross Validation method.
   --hold-out            Use Hold-out (TestOnTestData) method.
 ```
