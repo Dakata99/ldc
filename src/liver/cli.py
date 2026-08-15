@@ -1,15 +1,16 @@
 import argparse
+from pathlib import Path
 
 import argcomplete
 
-AVAILABLE_CONFIGS = (
+AVAILABLE_CONFIGS: tuple[str, ...] = (
 	"default",
 	"default-full",
 	"global",
 	"experiment1",
 	"experiment2",
 	"experiment3",
-	"expr3-default",  # Tied for experiment 3
+	"experiment3-default",  # Tied for experiment 3
 )
 
 CROSS_VALIDATION: str = "cross-validation"
@@ -53,18 +54,13 @@ def main() -> None:
 		default="default",
 		help="Configuration to use for the experiment",
 	)
-	pt = parser.add_mutually_exclusive_group()
-	pt.add_argument(
+	parser.add_argument(
 		"--plot-only",
-		action="store_true",
-		default=False,
+		nargs="?",
+		type=Path,
+		default=None,
+		metavar="RESULTS_DIR",
 		help="Plot only on already existing results.",
-	)
-	pt.add_argument(
-		"--iplot",
-		action="store_true",
-		default=False,
-		help="Plot only on already existing results (interactivity).",
 	)
 	mt = parser.add_mutually_exclusive_group()
 	mt.add_argument(
@@ -97,27 +93,15 @@ def main() -> None:
 		# Plot the results for the specified experiment
 		from .plot import main as plot
 
-		plot(args.experiment, method, args.config)
-	elif args.iplot:
-		from pathlib import Path
+		path: Path = args.plot_only
+		if not path.is_file():
+			raise FileNotFoundError(f"No such file: {path}")
+		elif not path.suffix == ".csv":
+			raise FileNotFoundError("Invalid file extension!")
 
-		from .plot import main as plot
-		from .utils import root
+		experiment = path.parent.stem.replace("experiment", "")
+		csv: list[str] = path.stem.split("-")
+		config: str = csv[0]
+		mtd: str = "-".join(csv[1:])
 
-		# Get available CSV files
-		csvs: list[Path] = list(root("results").relative_to(root()).glob("*.csv"))
-		csvs.sort()
-
-		prompt = "CSV files:\n"
-		for i, csv_file in enumerate(csvs, 1):
-			prompt += f"{i}) {csv_file}\n"
-		prompt += "\nChoose CSV file to plot (enter a number): "
-
-		idx = int(input(prompt))
-		csv: Path = csvs[idx - 1]
-		filename: str = csv.stem
-		parts = filename.split("-")
-		exprid, config, method = int(parts[0][-1]), "-".join(parts[1:-1]), parts[-1]
-
-		# Plot the results for the specified experiment
-		plot(exprid, method, config)
+		plot(experiment, mtd, config)

@@ -6,35 +6,39 @@ from loguru import logger
 from Orange.data import Table
 
 from .cli import AVAILABLE_CONFIGS
-from .utils import root
-
-DATASETS_PATH: Path = root("datasets")
-DATASETS: dict[str, Path] = {
-	"experiment1": DATASETS_PATH / "expr1" / "experiment1.tab",
-	"experiment2": DATASETS_PATH / "expr2" / "experiment2.tab",
-	"experiment3": DATASETS_PATH / "expr3" / "experiment3.tab",
-}
+from .utils import config_dir, datasets_dir
 
 
-def load_dataset(dataset: str) -> Table:
+def load_dataset(datasetid: int) -> tuple[Table, Table]:
 	"""Load file for the specified dataset.
 
 	Args:
-		dataset (str):  Name of the dataset to load.
-						Available options are: 'experiment1', 'experiment2', 'experiment3'.
+		datasetid (int):    Id of the dataset to load.
+							Available options are: '1', '2', '3'.
 	"""
-	path = DATASETS[dataset]
-	logger.info("Loading dataset from: {}", path)
+	experiment: str = f"experiment{datasetid}"
 
-	if not path.exists():
+	path: Path = datasets_dir(experiment)
+	train: Path = path / "train-data.tab"
+	test: Path = path / "test-data.tab"
+
+	if path is None:
+		raise RuntimeError(f"No such dataset: {experiment}")
+	elif not path.exists():
 		raise FileNotFoundError(f"Dataset file does not exist: {path}")
+	elif not train.exists() or not test.exists():
+		raise FileNotFoundError("Either train or test, or both files don't exist!")
 
-	data = Table(str(path))
+	train_data: Table = Table(str(train))
+	test_data: Table = Table(str(test))
 
-	logger.success(f"Dataset loaded successfully: {path}")
-	logger.info("Loaded rows: {}", len(data))
+	logger.success(f"Train data loaded successfully: {train}")
+	logger.debug("Loaded rows: {}", len(train_data))
 
-	return data
+	logger.success(f"Test data loaded successfully: {test}")
+	logger.debug("Loaded rows: {}", len(test_data))
+
+	return train_data, test_data
 
 
 def load_configuration(config: str = "default") -> Any:
@@ -45,7 +49,7 @@ def load_configuration(config: str = "default") -> Any:
 			f"Please, specify a valid configuration! Available are: {AVAILABLE_CONFIGS}"
 		)
 
-	configuration = root("configs", f"{config}.json")
+	configuration = config_dir(f"{config}.json")
 
 	with open(configuration) as fd:
 		data = json.load(fd)

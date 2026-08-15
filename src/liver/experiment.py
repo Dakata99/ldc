@@ -10,11 +10,10 @@ from Orange.evaluation.testing import CrossValidation, TestOnTestData
 from Orange.preprocess import Average, Continuize, Impute, Normalize, PreprocessorList
 import pandas as pd
 
-from .load import load_configuration
-from .utils import create_learners, profiler, root
+from .load import load_configuration, load_dataset
+from .utils import create_learners, profiler, root_dir
 
-OUTPUT_DIR: Path = root("results")
-CSV_FILE: str = "experiment{experiment}-{config}-{method}.csv"
+CSV_FILENAME: str = "{config}-{method}.csv"
 
 
 EXPERIMENTS: dict[int, str] = {
@@ -138,9 +137,10 @@ class TestAndScore:
 		df = pd.DataFrame(rows)
 		logger.success(df.to_string(index=False))
 
-		if not OUTPUT_DIR.exists():
-			OUTPUT_DIR.mkdir(parents=True)
-		df.to_csv(OUTPUT_DIR / output_filename, index=False)
+		results_dir: Path = root_dir("results", f"experiment{exprid}")
+		if not results_dir.exists():
+			results_dir.mkdir(parents=True)
+		df.to_csv(results_dir / output_filename, index=False)
 
 
 def main(
@@ -150,8 +150,7 @@ def main(
 	logger.info(f"Running experiment: {EXPERIMENTS[exprid]}")
 
 	# 1) Load train, test data
-	train = Table(str(root("datasets", f"expr{exprid}", f"expr{exprid}-train-data.tab")))
-	test = Table(str(root("datasets", f"expr{exprid}", f"expr{exprid}-test-data.tab")))
+	train, test = load_dataset(exprid)
 
 	# 2) Load configuration and create learners
 	config = load_configuration(configuration)
@@ -169,4 +168,4 @@ def main(
 
 	ts = TestAndScore(learners_to_evaluate)
 	ts.train(train, test, method)
-	ts.eval(exprid, CSV_FILE.format(experiment=exprid, config=configuration, method=method))
+	ts.eval(exprid, CSV_FILENAME.format(config=configuration, method=method))

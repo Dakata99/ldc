@@ -30,9 +30,8 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def root(*args: Path | str) -> Path:
+def root_dir(*args: Path | str) -> Path:
 	"""Get root folder of the project.
-	TODO: maybe find a better way?
 
 	Args:
 		*args: path components to join with the project root.
@@ -40,7 +39,37 @@ def root(*args: Path | str) -> Path:
 	Returns:
 		Path: the path to the project root joined with the provided path components.
 	"""
-	return Path(__file__).resolve().parents[2].joinpath(*args)
+	path = Path(__file__).resolve()
+
+	for parent in path.parents:
+		if (parent / "pyproject.toml").exists():
+			return parent.joinpath(*args)
+
+	raise RuntimeError("Could not find project root!")
+
+
+def config_dir(*args: Path | str) -> Path:
+	"""Get configs folder.
+
+	Args:
+		*args: path components to join with the config folder.
+
+	Returns:
+		Path: the path to the configs folder joined with the provided path components.
+	"""
+	return root_dir("configs", *args)
+
+
+def datasets_dir(*args: Path | str) -> Path:
+	"""Get `datasets` folder.
+
+	Args:
+		*args: path components to join with the config folder.
+
+	Returns:
+		Path: the path to the `datasets` folder joined with the provided path components.
+	"""
+	return root_dir("datasets", *args)
 
 
 def create_learners(config: dict[str, Any]) -> dict[str, list[Any]]:

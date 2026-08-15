@@ -7,9 +7,9 @@ from loguru import logger
 import pandas as pd
 import plotly.graph_objects as go
 
-from .utils import root
+from .utils import root_dir
 
-TEMPLATES: Path = root("templates")
+TEMPLATES: Path = root_dir("templates")
 
 LEARNER_TO_FAMILY_MAPPING: dict[str, str] = {
 	"LogisticRegressionLearner": "LR",
@@ -101,14 +101,14 @@ def heatmap(df: pd.DataFrame) -> go.Figure:
 
 def main(exprid: int, method: str, config: str) -> None:
 	# 1) Load the results (CSV file) into a DataFrame
-	fd = root("results", f"experiment{exprid}-{config}-{method}.csv")
+	fd = root_dir("results", f"experiment{exprid}", f"{config}-{method}.csv")
 	if not fd.exists():
 		raise FileNotFoundError(f"Results file not found: {fd}")
 
 	df = pd.read_csv(fd)
 	logger.success(f"Loaded file: {fd}")
 
-	# FIXME: drop weighted matrics for scenario 2 and 3
+	# FIXME: drop weighted metrics for scenario 2 and 3
 	if any("Sick" in column for column in df.columns):
 		df.drop(columns=["Recall(weighted)", "F1(weighted)"], inplace=True)
 
@@ -185,11 +185,11 @@ def main(exprid: int, method: str, config: str) -> None:
 		),
 	)
 
-	expr = root("reports", f"expr{exprid}-{config}-{method}")
-	if not expr.exists():
-		expr.mkdir(parents=True)
+	reports = root_dir("reports", f"experiment{exprid}", f"{config}-{method}")
+	if not reports.exists():
+		reports.mkdir(parents=True)
 
-	output_file: Path = root("reports", expr / "index.html")
+	output_file: Path = reports / "index.html"
 	output_file.parent.mkdir(parents=True, exist_ok=True)
 	output_file.write_text(index, encoding="utf-8")
 
@@ -219,12 +219,12 @@ def main(exprid: int, method: str, config: str) -> None:
 			),
 		)
 
-		ofile: Path = root("reports", expr / f"{FAMILY_TO_FILE_MAPPING[family]}.html")
+		ofile: Path = root_dir("reports", reports / f"{FAMILY_TO_FILE_MAPPING[family]}.html")
 		ofile.parent.mkdir(parents=True, exist_ok=True)
 		ofile.write_text(page, encoding="utf-8")
 
 		logger.success(f"HTML report generated: {ofile}")
 
 	# Copy CSS file next to generated files
-	shutil.copy(root("templates/styles.css"), expr)
-	shutil.copy(root("templates/script.js"), expr)
+	shutil.copy(root_dir("templates/styles.css"), reports)
+	shutil.copy(root_dir("templates/script.js"), reports)
