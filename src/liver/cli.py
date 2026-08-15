@@ -84,7 +84,7 @@ def main() -> None:
 	# Method for evaluation, hold-out = test on test data
 	method = CROSS_VALIDATION if args.cross_validation else HOLD_OUT
 
-	if args.experiment and not args.plot_only and not args.iplot:
+	if args.experiment and not args.plot_only:
 		# Run the analysis for the specified experiment
 		from .core import run_analysis
 
