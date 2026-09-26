@@ -25,8 +25,14 @@ The following datasets are being used:
 
 To evaluate the experiments, first set up the environment:
 ```bash
-source setupenv
+uv sync
 ```
+
+If you want to use the `liver` command directly, activate the virtual environment by:
+```bash
+source .venv/bin/activate
+```
+Otherwise, you it via `uv` tool like: `uv run liver [arguments]`
 
 Then the `liver` command will be present and you can run `liver -h` to see what it does:
 ```bash
