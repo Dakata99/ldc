@@ -1,4 +1,42 @@
-INHERIT: .mkdocs.base.yml
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  search: {}
+
+markdown_extensions:
+  admonition: {}
+  attr_list: {}
+  def_list: {}
+  tables: {}
+  toc:
+    permalink: true
+  pymdownx.details: {}
+  pymdownx.superfences: {}
+  pymdownx.inlinehilite: {}
+  pymdownx.snippets: {}
+  mdx_breakless_lists: {}
 
 site_name: Liver Disease Classification
 site_description: Portfolio of machine learning experiments for liver disease classification using Orange3 & Python.
@@ -18,3 +56,4 @@ nav:
         - Gradient Boosting: orange-python-mapping/gradient-boosting.md
         - Neural Network: orange-python-mapping/neural-network.md
         - Tree: orange-python-mapping/tree.md
+    - Experiments: experiments.md

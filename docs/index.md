@@ -25,7 +25,8 @@ The following datasets are being used:
 
 To evaluate the experiments, first set up the environment:
 ```bash
-source setupenv
+uv sync
+. .venv/bin/activate
 ```
 
 Then the `liver` command will be present and you can run `liver -h` to see what it does:
